@@ -106,7 +106,7 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
 
       - name: Run super linter.
-        uses: super-linter/super-linter/slim@v8.1.0
+        uses: super-linter/super-linter/slim@v8.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.AUTH_TOKEN }}
           VALIDATE_CHECKOV: ${{ inputs.validate_checkov }}
