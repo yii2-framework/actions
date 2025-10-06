@@ -164,18 +164,19 @@ jobs:
           inputs.enable-concurrency &&
           format(
             '{0}-{1}-{2}-{3}-{4}',
-            github.run_id,
-            github.job,
             matrix.os,
             matrix.php-version,
-            matrix.database-version
+            inputs.database-type,
+            matrix.database-version,
+            inputs.concurrency-group
           ) ||
           format(
-            '{0}-{1}-{2}-{3}-{4}',
+            '{0}-{1}-{2}-{3}-{4}-{5}',
             github.run_id,
             github.job,
             matrix.os,
             matrix.php-version,
+            inputs.database-type,
             matrix.database-version
           )
         }}
