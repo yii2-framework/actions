@@ -169,13 +169,20 @@ jobs:
           inputs.enable-concurrency &&
           format(
             '{0}-{1}-{2}-{3}-{4}',
+            github.run_id,
+            github.job,
             matrix.os,
             matrix.php-version,
-            inputs.database-type,
-            matrix.database-version,
-            inputs.concurrency-group
+            matrix.database-version
           ) ||
-          format('{0}', github.run_id)
+          format(
+            '{0}-{1}-{2}-{3}-{4}',
+            github.run_id,
+            github.job,
+            matrix.os,
+            matrix.php-version,
+            matrix.database-version
+          )
         }}
       cancel-in-progress: ${{ inputs.enable-concurrency }}
 
