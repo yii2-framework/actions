@@ -1,0 +1,124 @@
+---
+name: linter
+
+on:
+  workflow_call:
+    inputs:
+      checkout_fetch_depth:
+        description: Fetch depth for checkout action.
+        default: 0
+        required: false
+        type: number
+      concurrency-group:
+        description: Concurrency group name.
+        default: linter/${{ github.workflow }}-${{ github.ref }}
+        required: false
+        type: string
+      enable-concurrency:
+        description: Enable concurrency.
+        default: true
+        required: false
+        type: boolean
+      os:
+        description: OS runner as a JSON array string '["ubuntu-latest"]'.
+        default: '["ubuntu-latest"]'
+        required: false
+        type: string
+      validate_checkov:
+        description: Enable Checkov validation.
+        default: false
+        required: false
+        type: boolean
+      validate_env:
+        description: Enable ENV file validation.
+        default: false
+        required: false
+        type: boolean
+      validate_github_actions_zizmor:
+        description: Enable GitHub Actions Zizmor validation.
+        default: false
+        required: false
+        type: boolean
+      validate_git_merge_conflict_markers:
+        description: Enable Git merge conflict markers validation.
+        default: false
+        required: false
+        type: boolean
+      validate_jscpd:
+        description: Enable JSCPD validation.
+        default: false
+        required: false
+        type: boolean
+      validate_php:
+        description: Enable PHP validation.
+        default: false
+        required: false
+        type: boolean
+      validate_php_builtin:
+        description: Enable PHP Builtin validation.
+        default: false
+        required: false
+        type: boolean
+      validate_php_phpcs:
+        description: Enable PHP PHPCS validation.
+        default: false
+        required: false
+        type: boolean
+      validate_php_phpstan:
+        description: Enable PHP PHPStan validation.
+        default: false
+        required: false
+        type: boolean
+      validate_php_psalm:
+        description: Enable PHP Psalm validation.
+        default: false
+        required: false
+        type: boolean
+      validate_trivy:
+        description: Enable Trivy validation.
+        default: false
+        required: false
+        type: boolean
+
+    secrets:
+      AUTH_TOKEN:
+        description: GitHub token.
+        required: true
+
+jobs:
+  linter:
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: ${{ inputs.concurrency-group }}
+
+    name: Super Linter
+
+    runs-on: ${{ fromJSON(inputs.os) }}
+
+    steps:
+      - name: Monitor action permissions.
+        if: runner.os != 'Windows'
+        uses: GitHubSecurityLab/actions-permissions/monitor@v1
+
+      - name: Checkout.
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+
+      - name: Run super linter.
+        uses: super-linter/super-linter/slim@v8.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTH_TOKEN }}
+          VALIDATE_CHECKOV: ${{ inputs.validate_checkov }}
+          VALIDATE_ENV: ${{ inputs.validate_env }}
+          VALIDATE_GITHUB_ACTIONS_ZIZMOR: >-
+            ${{ inputs.validate_github_actions_zizmor }}
+          VALIDATE_GIT_MERGE_CONFLICT_MARKERS: >-
+            ${{ inputs.validate_git_merge_conflict_markers }}
+          VALIDATE_JSCPD: ${{ inputs.validate_jscpd }}
+          VALIDATE_PHP: ${{ inputs.validate_php }}
+          VALIDATE_PHP_BUILTIN: ${{ inputs.validate_php_builtin }}
+          VALIDATE_PHP_PHPCS: ${{ inputs.validate_php_phpcs }}
+          VALIDATE_PHP_PHPSTAN: ${{ inputs.validate_php_phpstan }}
+          VALIDATE_PHP_PSALM: ${{ inputs.validate_php_psalm }}
+          VALIDATE_TRIVY: ${{ inputs.validate_trivy }}
