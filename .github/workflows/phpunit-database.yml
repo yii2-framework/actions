@@ -164,7 +164,19 @@ jobs:
     name: PHP ${{ matrix.php-version }}-${{ inputs.database-type }}-${{ matrix.database-version }}
 
     concurrency:
-      group: ${{ matrix.os }}-${{ matrix.php-version }}-${{ inputs.database-type }}-${{ matrix.database-version }}-${{ inputs.concurrency-group }}
+      group: >-
+        ${{
+          inputs.enable-concurrency &&
+          format(
+            '{0}-{1}-{2}-{3}-{4}',
+            matrix.os,
+            matrix.php-version,
+            inputs.database-type,
+            matrix.database-version,
+            inputs.concurrency-group
+          ) ||
+          format('{0}', github.run_id)
+        }}
       cancel-in-progress: ${{ inputs.enable-concurrency }}
 
     runs-on: ${{ matrix.os }}
