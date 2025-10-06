@@ -96,8 +96,8 @@ on:
         required: false
         type: boolean
       os:
-        description: OS runner as a JSON array string '["ubuntu-latest"]'.
-        default: '["ubuntu-latest","windows-2022"]'
+        description: OS runner as a JSON array string, containers require Linux.
+        default: '["ubuntu-latest"]'
         required: false
         type: string
       phpunit-configuration:
