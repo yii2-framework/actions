@@ -12,6 +12,6 @@ permissions:
 
 jobs:
   linter:
-    uses: .github/workflows/super-linter.yml@main
+    uses: ./.github/workflows/super-linter.yml@initial-release
     secrets:
       AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
