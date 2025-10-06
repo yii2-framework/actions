@@ -24,6 +24,16 @@ on:
         default: '["ubuntu-latest"]'
         required: false
         type: string
+      validate_biome_format:
+        description: Enable Biome format validation.
+        default: false
+        required: false
+        type: boolean
+      validate_biome_lint:
+        description: Enable Biome lint validation.
+        default: false
+        required: false
+        type: boolean
       validate_checkov:
         description: Enable Checkov validation.
         default: false
@@ -106,9 +116,11 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
 
       - name: Run super linter.
-        uses: super-linter/super-linter/slim@v8.1.0
+        uses: super-linter/super-linter/slim@v8.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.AUTH_TOKEN }}
+          VALIDATE_BIOME_FORMAT: ${{ inputs.validate_biome_format }}
+          VALIDATE_BIOME_LINT: ${{ inputs.validate_biome_lint }}
           VALIDATE_CHECKOV: ${{ inputs.validate_checkov }}
           VALIDATE_ENV: ${{ inputs.validate_env }}
           VALIDATE_GITHUB_ACTIONS_ZIZMOR: >-
