@@ -1,9 +1,5 @@
 # Changelog
 
-## v1.0.0 Under development
-
-- Initial release
-
-## v1 Under development
+## v1.0.0 October 6, 2025
 
 - Initial release
