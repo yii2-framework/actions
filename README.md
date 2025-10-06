@@ -50,7 +50,7 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 ```yaml
 ---
 on:
-  pull_request:
+  pull_request: &ignore-paths
     paths-ignore:
       - ".gitattributes"
       - ".gitignore"
@@ -58,13 +58,7 @@ on:
       - "docs/**"
       - "README.md"
 
-  push:
-    paths-ignore:
-      - ".gitattributes"
-      - ".gitignore"
-      - "CHANGELOG.md"
-      - "docs/**"
-      - "README.md"
+  push: *ignore-paths
 
 name: composer-require-checker
 
@@ -84,7 +78,7 @@ jobs:
 ```yaml
 ---
 on:
-  pull_request:
+  pull_request: &ignore-paths
     paths-ignore:
       - ".gitattributes"
       - ".gitignore"
@@ -92,13 +86,7 @@ on:
       - "docs/**"
       - "README.md"
 
-  push:
-    paths-ignore:
-      - ".gitattributes"
-      - ".gitignore"
-      - "CHANGELOG.md"
-      - "docs/**"
-      - "README.md"
+  push: *ignore-paths
 
 name: easy-coding-standards
 
@@ -119,7 +107,7 @@ jobs:
 ```yaml
 ---
 on:
-  pull_request:
+  pull_request: &ignore-paths
     paths-ignore:
       - ".gitattributes"
       - ".gitignore"
@@ -127,13 +115,7 @@ on:
       - "docs/**"
       - "README.md"
 
-  push:
-    paths-ignore:
-      - ".gitattributes"
-      - ".gitignore"
-      - "CHANGELOG.md"
-      - "docs/**"
-      - "README.md"
+  push: *ignore-paths
 
 name: mutation-testing
 
@@ -159,7 +141,7 @@ jobs:
 ```yaml
 ---
 on:
-  pull_request:
+  pull_request: &ignore-paths
     paths-ignore:
       - ".gitattributes"
       - ".gitignore"
@@ -167,13 +149,7 @@ on:
       - "docs/**"
       - "README.md"
 
-  push:
-    paths-ignore:
-      - ".gitattributes"
-      - ".gitignore"
-      - "CHANGELOG.md"
-      - "docs/**"
-      - "README.md"
+  push: *ignore-paths
 
 name: build
 
@@ -211,7 +187,7 @@ jobs:
 ```yaml
 ---
 on:
-  pull_request:
+  pull_request: &ignore-paths
     paths-ignore:
       - ".gitattributes"
       - ".gitignore"
@@ -219,13 +195,7 @@ on:
       - "docs/**"
       - "README.md"
 
-  push:
-    paths-ignore:
-      - ".gitattributes"
-      - ".gitignore"
-      - "CHANGELOG.md"
-      - "docs/**"
-      - "README.md"
+  push: *ignore-paths
 
 name: build-mysql
 
@@ -270,7 +240,7 @@ jobs:
 ```yaml
 ---
 on:
-  pull_request:
+  pull_request: &ignore-paths
     paths-ignore:
       - ".gitattributes"
       - ".gitignore"
@@ -278,13 +248,7 @@ on:
       - "docs/**"
       - "README.md"
 
-  push:
-    paths-ignore:
-      - ".gitattributes"
-      - ".gitignore"
-      - "CHANGELOG.md"
-      - "docs/**"
-      - "README.md"
+  push: *ignore-paths
 
 name: static-analysis
 
