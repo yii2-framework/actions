@@ -57,7 +57,7 @@ on:
         description: Database health check retries.
         default: 5
         required: false
-        type: string
+        type: number
       database-image:
         description: Docker image for database.
         required: true
@@ -65,7 +65,7 @@ on:
       database-port:
         description: Database port.
         required: true
-        type: string
+        type: number
       database-type:
         description: Database type (mysql, pgsql, mssql, oracle).
         required: true
@@ -73,11 +73,6 @@ on:
       database-versions:
         description: Database versions to test.
         default: '["latest"]'
-        required: false
-        type: string
-      debug:
-        description: Display warnings in phpunit.
-        default:
         required: false
         type: string
       enable-concurrency:
@@ -202,7 +197,7 @@ jobs:
           - ${{ format('{0}:{0}', inputs.database-port) }}
         env: ${{ fromJson(inputs.database-env) }}
         options: >-
-          --name=database
+          --name=database-${{ github.run_id }}
           --health-cmd="${{ inputs.database-health-cmd }}"
           --health-interval=10s
           --health-timeout=5s
