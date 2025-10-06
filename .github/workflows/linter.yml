@@ -1,0 +1,17 @@
+---
+on:
+  - pull_request
+  - push
+
+name: linter
+
+permissions:
+  checks: write
+  contents: read
+  statuses: write
+
+jobs:
+  linter:
+    uses: ./.github/workflows/super-linter.yml
+    secrets:
+      AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
