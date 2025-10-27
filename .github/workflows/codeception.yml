@@ -154,4 +154,4 @@ jobs:
 
       - name: Download all workflow run artifacts
         if: ${{ inputs.debug }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
