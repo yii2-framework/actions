@@ -100,10 +100,29 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download ECS config file.
-        if: ${{ inputs.download-config == true}}
+        if: ${{ inputs.download-config }}
         shell: bash
         run: |
+          # skip download if ecs.php already exists in the repository
+          if [ -f ecs.php ]; then
+            echo "Using ecs.php from repository"
+            exit 0
+          fi
+
+          set -e
+          echo "Downloading ecs.php from main branch..."
+
+          wget --timeout=10 --tries=3 \
+            https://raw.githubusercontent.com/yii2-framework/actions/main/ecs.php \
+            -O ecs.php
+
           wget https://raw.githubusercontent.com/yii2-framework/actions/main/ecs.php -O ecs.php
+
+          # validate it's a PHP file
+          if ! head -1 ecs.php | grep -q "<?php"; then
+            echo "Error: Downloaded file is not a valid PHP file."
+            exit 1
+          fi
 
       - name: Setup PHP Environment.
         uses: yii2-framework/actions/actions/php-setup@main

@@ -40,7 +40,11 @@ return ECSConfig::configure()
     ->withConfiguredRule(
         OrderedImportsFixer::class,
         [
-            'imports_order' => ['class', 'function', 'const'],
+            'imports_order' => [
+                'class',
+                'function',
+                'const',
+            ],
             'sort_algorithm' => 'alpha',
         ],
     )
@@ -51,7 +55,7 @@ return ECSConfig::configure()
             __DIR__ . '/tests',
         ],
     )
-    ->withPhpCsFixerSets(perCS20: true)
+    ->withPhpCsFixerSets(perCS30: true)
     ->withPreparedSets(
         cleanCode: true,
         comments: true,
