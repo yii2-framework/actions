@@ -210,7 +210,7 @@ jobs:
         uses: GitHubSecurityLab/actions-permissions/monitor@v1
 
       - name: Checkout.
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Additional Database Setup.
         if: inputs.setup-commands != ''
