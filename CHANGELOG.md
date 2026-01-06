@@ -1,5 +1,7 @@
 # Changelog
 
+## v1.0.2 Under development
+
 ## v1.0.1 October 8, 2025
 
 - Bug #5: Remove unnecessary action permissions monitoring step in `codeception.yml` (@terabytesoftw)
