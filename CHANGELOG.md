@@ -2,6 +2,8 @@
 
 ## v1.0.2 Under development
 
+- Bug #12: Remove outdated community guidelines and templates from the repository (@terabytesoftw)
+
 ## v1.0.1 October 8, 2025
 
 - Bug #5: Remove unnecessary action permissions monitoring step in `codeception.yml` (@terabytesoftw)
