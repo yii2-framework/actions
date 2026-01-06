@@ -111,7 +111,7 @@ jobs:
         uses: GitHubSecurityLab/actions-permissions/monitor@v1
 
       - name: Checkout.
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
 
