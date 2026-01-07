@@ -116,8 +116,6 @@ jobs:
             https://raw.githubusercontent.com/yii2-framework/actions/main/ecs.php \
             -O ecs.php
 
-          wget https://raw.githubusercontent.com/yii2-framework/actions/main/ecs.php -O ecs.php
-
           # validate it's a PHP file
           if ! head -1 ecs.php | grep -q "<?php"; then
             echo "Error: Downloaded file is not a valid PHP file."
