@@ -3,6 +3,7 @@
 ## v1.0.2 Under development
 
 - Bug #12: Remove outdated community guidelines and templates from the repository (@terabytesoftw)
+- Enh #13: Add `ECS` configuration file and update workflow to download config (@terabytesoftw)
 
 ## v1.0.1 October 8, 2025
 
