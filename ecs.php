@@ -30,6 +30,7 @@ return ECSConfig::configure()
                 'construct',
                 'destruct',
                 'magic',
+                'phpunit',
                 'method_protected_abstract',
                 'method_public',
                 'method_protected',
