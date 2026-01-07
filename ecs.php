@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use PhpCsFixer\Fixer\ClassNotation\{ClassDefinitionFixer, OrderedClassElementsFixer, OrderedTraitsFixer};
 use PhpCsFixer\Fixer\Import\{NoUnusedImportsFixer, OrderedImportsFixer};
+use PhpCsFixer\Fixer\Phpdoc\PhpdocTypesOrderFixer;
 use PhpCsFixer\Fixer\StringNotation\SingleQuoteFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
@@ -29,7 +30,7 @@ return ECSConfig::configure()
                 'construct',
                 'destruct',
                 'magic',
-                'phpunit',
+                'method_protected_abstract',
                 'method_public',
                 'method_protected',
                 'method_private',
@@ -46,6 +47,13 @@ return ECSConfig::configure()
                 'const',
             ],
             'sort_algorithm' => 'alpha',
+        ],
+    )
+    ->withConfiguredRule(
+        PhpdocTypesOrderFixer::class,
+        [
+            'sort_algorithm' => 'none',
+            'null_adjustment' => 'always_last',
         ],
     )
     ->withFileExtensions(['php'])
