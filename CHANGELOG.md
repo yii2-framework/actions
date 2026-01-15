@@ -3,6 +3,7 @@
 ## v1.0.3 Under development
 
 - Bug #15: Add `PhpdocTypesOrderFixer` configuration and update method order in `ECS` configuration (@terabytesoftw)
+- Enh #16: Add `OrderedTypesFixer` configuration to enhance class type ordering in `ECS` configuration (@terabytesoftw)
 
 ## v1.0.2 January 3, 2026
 
