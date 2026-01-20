@@ -1,5 +1,7 @@
 # Changelog
 
+## v1.0.4 Under development
+
 ## v1.0.3 January 20, 2026
 
 - Bug #15: Add `PhpdocTypesOrderFixer` configuration and update method order in `ECS` configuration (@terabytesoftw)
