@@ -4,6 +4,7 @@
 
 - Bug #15: Add `PhpdocTypesOrderFixer` configuration and update method order in `ECS` configuration (@terabytesoftw)
 - Enh #16: Add `OrderedTypesFixer` configuration to enhance class type ordering in `ECS` configuration (@terabytesoftw)
+- Enh #17: Update GitHub workflows to support `PHP 8.5` testing (@terabytesoftw)
 
 ## v1.0.2 January 3, 2026
 
