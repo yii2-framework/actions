@@ -126,4 +126,4 @@ runs:
       uses: codecov/codecov-action@v5
       with:
         token: ${{ inputs.coverage-token }}
-        file: ./${{ inputs.coverage-file }}
+        files: ./${{ inputs.coverage-file }}
