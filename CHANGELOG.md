@@ -2,7 +2,7 @@
 
 ## v1.0.4 Under development
 
-- Bug #19: Correct parameter name from `file` to `files` in Codecov action (@terabytesoftw) 
+- Bug #19: Correct parameter name from `file` to `files` in Codecov action (@terabytesoftw)
 
 ## v1.0.3 January 20, 2026
 
