@@ -1,5 +1,7 @@
 # Changelog
 
+## v1.0.5 Under development
+
 ## v1.0.4 February 2, 2026
 
 - Bug #19: Correct parameter name from `file` to `files` in Codecov action (@terabytesoftw)
