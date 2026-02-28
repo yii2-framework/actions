@@ -150,7 +150,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: output
-          path: ./runtime/tests/_output
+          path: ./runtime/output
 
       - name: Download all workflow run artifacts
         if: ${{ inputs.debug }}
