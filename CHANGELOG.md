@@ -1,5 +1,7 @@
 # Changelog
 
+## v1.0.6 Under development
+
 ## v1.0.5 February 28, 2026
 
 - Bug #20: Update path for test output in Codeception workflow to match actual output directory (@terabytesoftw)
