@@ -44,6 +44,11 @@ on:
         default: false
         required: false
         type: boolean
+      validate_gitleaks:
+        description: Enable Gitleaks validation.
+        default: true
+        required: false
+        type: boolean
       validate_github_actions_zizmor:
         description: Enable GitHub Actions Zizmor validation.
         default: false
@@ -123,6 +128,7 @@ jobs:
           VALIDATE_BIOME_LINT: ${{ inputs.validate_biome_lint }}
           VALIDATE_CHECKOV: ${{ inputs.validate_checkov }}
           VALIDATE_ENV: ${{ inputs.validate_env }}
+          VALIDATE_GITLEAKS: ${{ inputs.validate_gitleaks }}
           VALIDATE_GITHUB_ACTIONS_ZIZMOR: >-
             ${{ inputs.validate_github_actions_zizmor }}
           VALIDATE_GIT_MERGE_CONFLICT_MARKERS: >-
