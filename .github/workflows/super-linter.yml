@@ -46,7 +46,7 @@ on:
         type: boolean
       validate_gitleaks:
         description: Enable Gitleaks validation.
-        default: true
+        default: false
         required: false
         type: boolean
       validate_github_actions_zizmor:
