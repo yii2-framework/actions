@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.0.4 February 2, 2026
 
-- fix(codecov): correct parameter name from `file` to `files`.
+- fix(Codecov): correct parameter name from `file` to `files`.
 
 ## v1.0.3 January 20, 2026
 
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.0.2 January 3, 2026
 
-- chore(repo): remove outdated community guidelines and templates.
+- chore(repository): remove outdated community guidelines and templates.
 - feat(ecs): add `ECS` configuration file and update workflow to download it.
 - feat(rector): add initial configuration with `PHP 8.1` support.
 
