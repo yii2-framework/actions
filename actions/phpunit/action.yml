@@ -117,9 +117,10 @@ runs:
 
     - name: Upload test results to Codecov.
       if: ${{ !cancelled() && inputs.coverage-driver != 'none' }}
-      uses: codecov/test-results-action@v1
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ inputs.coverage-token }}
+        report_type: test_results
 
     - name: Upload coverage to Codecov.
       if: ${{ !cancelled() && inputs.coverage-driver != 'none' }}

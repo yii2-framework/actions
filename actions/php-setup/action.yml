@@ -65,12 +65,29 @@ runs:
     - name: Checkout
       uses: actions/checkout@v5
 
+    - name: Build PHP ini values.
+      id: build-ini-values
+      shell: bash
+      run: |
+        INI_VALUES="${{ inputs.ini-values }}"
+
+        if [ "${{ inputs.coverage-driver }}" = "none" ] \
+          && ! echo "$INI_VALUES" | grep -Eiq '(^|[[:space:],])opcache\.enable_cli[[:space:]]*='; then
+          if [ -n "$INI_VALUES" ]; then
+            INI_VALUES="$INI_VALUES, opcache.enable_cli=1"
+          else
+            INI_VALUES="opcache.enable_cli=1"
+          fi
+        fi
+
+        echo "values=$INI_VALUES" >> "$GITHUB_OUTPUT"
+
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
         coverage: ${{ inputs.coverage-driver }}
         extensions: ${{ inputs.extensions }}
-        ini-values: ${{ inputs.ini-values }}
+        ini-values: ${{ steps.build-ini-values.outputs.values }}
         php-version: ${{ inputs.php-version }}
         tools: ${{ inputs.tools }}
 
