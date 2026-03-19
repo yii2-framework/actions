@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.0.7 Under development
+
 ## v1.0.6 March 18, 2026
 
 - ci(actions): enable `opcache.enable_cli=1` when `coverage-driver=none` and migrate PHPUnit test results uploads to `codecov/codecov-action@v5`.
