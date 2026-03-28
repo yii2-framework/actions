@@ -36,7 +36,7 @@ on:
         type: string
       download-config:
         description: Whether to download the ECS config file.
-        default: true
+        default: false
         required: false
         type: boolean
       enable-concurrency:
