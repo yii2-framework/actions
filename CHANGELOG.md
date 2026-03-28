@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.0.7 Under development
 
+- fix!: remove `ecs.php` and `rector.php` files; update default for `download-config` in `ecs.yml`.
+
 ## v1.0.6 March 18, 2026
 
 - ci(actions): enable `opcache.enable_cli=1` when `coverage-driver=none` and migrate PHPUnit test results uploads to `codecov/codecov-action@v5`.
