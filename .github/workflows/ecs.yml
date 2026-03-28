@@ -113,7 +113,7 @@ jobs:
           echo "Downloading ecs.php from main branch..."
 
           wget --timeout=10 --tries=3 \
-            https://raw.githubusercontent.com/yii2-extensions/template/refs/heads/main/ecs.php \
+            https://raw.githubusercontent.com/yii2-extensions/template/main/ecs.php \
             -O ecs.php
 
           # validate it's a PHP file
