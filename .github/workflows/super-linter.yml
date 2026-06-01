@@ -19,11 +19,19 @@ on:
         default: true
         required: false
         type: boolean
+      enable_pull_request_summary_comment:
+        description: >-
+          Post the linter summary as a pull request comment. Requires a token
+          with `pull-requests: write` permission. Disabled by default to avoid
+          granting write-capable tokens to the linter.
+        default: false
+        required: false
+        type: boolean
       multi_status:
         description: >-
-          Report results as GitHub Actions status checks. Requires AUTH_TOKEN
-          and a token with `statuses: write` permission. Disabled by default to
-          avoid granting write-capable tokens to the linter.
+          Report results as GitHub Actions status checks. Requires a token with
+          `statuses: write` permission. Disabled by default to avoid granting
+          write-capable tokens to the linter.
         default: false
         required: false
         type: boolean
@@ -101,9 +109,10 @@ on:
     secrets:
       AUTH_TOKEN:
         description: >-
-          GitHub token used only when `multi_status` is enabled to report
-          status checks. Leave unset to run the linter without a write-capable
-          token.
+          GitHub token used only when `multi_status` or
+          `enable_pull_request_summary_comment` is enabled. When unset, the
+          linter falls back to the caller's `github.token`, whose permissions
+          are capped by the caller `permissions` block.
         required: false
 
 jobs:
@@ -129,7 +138,9 @@ jobs:
       - name: Run super linter.
         uses: super-linter/super-linter/slim@v8.5.0
         env:
-          GITHUB_TOKEN: ${{ secrets.AUTH_TOKEN }}
+          ENABLE_GITHUB_PULL_REQUEST_SUMMARY_COMMENT: >-
+            ${{ inputs.enable_pull_request_summary_comment }}
+          GITHUB_TOKEN: ${{ secrets.AUTH_TOKEN || github.token }}
           MULTI_STATUS: ${{ inputs.multi_status }}
           VALIDATE_BIOME_FORMAT: ${{ inputs.validate_biome_format }}
           VALIDATE_BIOME_LINT: ${{ inputs.validate_biome_lint }}
