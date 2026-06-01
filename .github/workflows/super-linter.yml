@@ -19,6 +19,14 @@ on:
         default: true
         required: false
         type: boolean
+      multi_status:
+        description: >-
+          Report results as GitHub Actions status checks. Requires AUTH_TOKEN
+          and a token with `statuses: write` permission. Disabled by default to
+          avoid granting write-capable tokens to the linter.
+        default: false
+        required: false
+        type: boolean
       os:
         description: OS runner as a JSON array string '["ubuntu-latest"]'.
         default: '["ubuntu-latest"]'
@@ -92,8 +100,11 @@ on:
 
     secrets:
       AUTH_TOKEN:
-        description: GitHub token.
-        required: true
+        description: >-
+          GitHub token used only when `multi_status` is enabled to report
+          status checks. Leave unset to run the linter without a write-capable
+          token.
+        required: false
 
 jobs:
   linter:
@@ -119,6 +130,7 @@ jobs:
         uses: super-linter/super-linter/slim@v8.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.AUTH_TOKEN }}
+          MULTI_STATUS: ${{ inputs.multi_status }}
           VALIDATE_BIOME_FORMAT: ${{ inputs.validate_biome_format }}
           VALIDATE_BIOME_LINT: ${{ inputs.validate_biome_lint }}
           VALIDATE_CHECKOV: ${{ inputs.validate_checkov }}
