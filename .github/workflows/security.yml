@@ -59,43 +59,14 @@ permissions:
   contents: read
 
 jobs:
-  actions:
-    if: ${{ inputs.validate_zizmor }}
-    name: GitHub Actions
-    runs-on: ${{ matrix.os }}
-
-    concurrency:
-      cancel-in-progress: ${{ inputs.enable-concurrency }}
-      group: actions-${{ matrix.os }}-${{ inputs.concurrency-group }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ${{ fromJson(inputs.os) }}
-
-    steps:
-      - name: Checkout repository.
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          fetch-depth: ${{ inputs.checkout_fetch_depth }}
-          persist-credentials: false
-
-      - name: Run zizmor.
-        uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
-        with:
-          advanced-security: false
-          annotations: true
-          inputs: ${{ inputs.audit-inputs }}
-          persona: ${{ inputs.persona }}
-
   secrets:
     if: ${{ inputs.validate_gitleaks }}
-    name: Secrets
+    name: Gitleaks
     runs-on: ${{ matrix.os }}
 
     concurrency:
       cancel-in-progress: ${{ inputs.enable-concurrency }}
-      group: secrets-${{ matrix.os }}-${{ inputs.concurrency-group }}
+      group: gitleaks-${{ matrix.os }}-${{ inputs.concurrency-group }}
 
     strategy:
       fail-fast: false
@@ -132,3 +103,32 @@ jobs:
           GITLEAKS_ENABLE_COMMENTS: false
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
           GITLEAKS_VERSION: ${{ inputs.gitleaks-version }}
+
+  zizmor:
+    if: ${{ inputs.validate_zizmor }}
+    name: Zizmor
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: zizmor-${{ matrix.os }}-${{ inputs.concurrency-group }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          persist-credentials: false
+
+      - name: Run zizmor.
+        uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+        with:
+          advanced-security: false
+          annotations: true
+          inputs: ${{ inputs.audit-inputs }}
+          persona: ${{ inputs.persona }}
