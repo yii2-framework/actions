@@ -7,13 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.0 Under development
 
-- feat(linter)!: replace Super-Linter with dedicated reusable quality jobs.
-- feat(security): add reusable security checks for zizmor and the official Gitleaks action.
-- refactor(linter)!: remove Super-Linter-specific inputs and token secret.
-- refactor(quality): keep secret scanning exclusively in `security.yml`.
-- refactor(quality): use the official codespell action for spelling checks.
-- fix(security): harden reusable workflows and composite actions for zizmor pedantic audits.
-- chore(format): add shared Prettier settings for Markdown examples.
+- ci(actions)!: replace Super-Linter with reusable quality and security workflows.
 
 ## v1.0.8 June 01, 2026
 

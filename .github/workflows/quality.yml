@@ -137,8 +137,7 @@ jobs:
         uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2.1.2
         with:
           files: ${{ steps.actionlint-files.outputs.files }}
-          flags: >-
-            -ignore 'property "workflow_(repository|sha)" is not defined'
+          flags: -ignore workflow_(repository|sha)
           version: ${{ inputs.actionlint-version }}
 
   editorconfig:
