@@ -6,7 +6,7 @@ on:
     inputs:
       audit-inputs:
         description: Paths or workflow/action inputs passed to zizmor.
-        default: .github actions
+        default: .github
         required: false
         type: string
       checkout_fetch_depth:

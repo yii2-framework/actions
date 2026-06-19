@@ -118,6 +118,8 @@ jobs:
       - name: Run actionlint.
         uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2.1.2
         with:
+          flags: >-
+            -ignore 'property "workflow_(repository|sha)" is not defined'
           version: ${{ inputs.actionlint-version }}
 
   editorconfig:
@@ -290,7 +292,23 @@ jobs:
         run: python -m pip install "yamllint==$YAMLLINT_VERSION"
 
       - name: Run yamllint.
-        run: >-
-          yamllint
-          -d '{extends: default, rules: {comments: {min-spaces-from-content: 1}, line-length: disable, truthy: disable}}'
-          .github actions
+        shell: bash
+        run: |
+          targets=()
+
+          if [ -d ".github" ]; then
+            targets+=(".github")
+          fi
+
+          if [ -d "actions" ]; then
+            targets+=("actions")
+          fi
+
+          if [ "${#targets[@]}" -eq 0 ]; then
+            echo "No yamllint targets found (.github/actions); skipping."
+            exit 0
+          fi
+
+          yamllint \
+            -d '{extends: default, rules: {comments: {min-spaces-from-content: 1}, line-length: disable, truthy: disable}}' \
+            "${targets[@]}"

@@ -148,8 +148,8 @@ jobs:
       - name: Checkout reusable actions.
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          repository: yii2-framework/actions
-          ref: ${{ github.workflow_sha }}
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
           path: .yii2-framework-actions
           persist-credentials: false
 
