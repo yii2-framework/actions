@@ -21,7 +21,7 @@ on:
         type: string
       editorconfig-checker-version:
         description: EditorConfig Checker version to use.
-        default: 3.7.0
+        default: v3.7.0
         required: false
         type: string
       enable-concurrency:
@@ -228,7 +228,8 @@ jobs:
             patterns+=("**/*.{yml,yaml}")
           fi
 
-          npm exec --yes --package "prettier@$PRETTIER_VERSION" --prettier --check "${patterns[@]}"
+          npm exec --yes --package "prettier@$PRETTIER_VERSION" -- \
+            prettier --check "${patterns[@]}"
 
   spelling:
     if: ${{ inputs.validate_spell_codespell }}
