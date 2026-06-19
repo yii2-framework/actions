@@ -62,16 +62,20 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@v5
+    - name: Checkout repository.
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      with:
+        clean: false
+        persist-credentials: false
 
     - name: Build PHP ini values.
       id: build-ini-values
       shell: bash
+      env:
+        COVERAGE_DRIVER: ${{ inputs.coverage-driver }}
+        INI_VALUES: ${{ inputs.ini-values }}
       run: |
-        INI_VALUES="${{ inputs.ini-values }}"
-
-        if [ "${{ inputs.coverage-driver }}" = "none" ] \
+        if [ "$COVERAGE_DRIVER" = "none" ] \
           && ! echo "$INI_VALUES" | grep -Eiq '(^|[[:space:],])opcache\.enable_cli[[:space:]]*='; then
           if [ -n "$INI_VALUES" ]; then
             INI_VALUES="$INI_VALUES, opcache.enable_cli=1"
@@ -83,7 +87,7 @@ runs:
         echo "values=$INI_VALUES" >> "$GITHUB_OUTPUT"
 
     - name: Install PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
       with:
         coverage: ${{ inputs.coverage-driver }}
         extensions: ${{ inputs.extensions }}
@@ -93,14 +97,23 @@ runs:
 
     - name: Update composer.
       shell: bash
-      run: composer self-update ${{ inputs.composer-version }}
+      env:
+        COMPOSER_VERSION: ${{ inputs.composer-version }}
+      run: |
+        if [ -n "$COMPOSER_VERSION" ]; then
+          composer self-update "$COMPOSER_VERSION"
+        else
+          composer self-update
+        fi
 
     - name: Configure composer on linux.
       shell: bash
       if: runner.os == 'Linux'
+      env:
+        AUTH_TOKEN: ${{ inputs.auth-token }}
       run: |
-        if [ "${{ inputs.auth-token }}" != '' ]; then
-          composer config -g github-oauth.github.com ${{ inputs.auth-token }};
+        if [ "$AUTH_TOKEN" != '' ]; then
+          composer config -g github-oauth.github.com "$AUTH_TOKEN";
         fi
 
     - name: Configure composer on windows.
@@ -115,12 +128,14 @@ runs:
 
     - name: Install dependencies with composer.
       shell: bash
-      run: >-
-        composer
-        ${{ inputs.composer-command }}
-        ${{ inputs.composer-flags }}
-        ${{
-          inputs.ignore-platform-reqs == 'true'
-          && '--ignore-platform-reqs'
-          || ''
-        }}
+      env:
+        COMPOSER_INSTALL_COMMAND: >-
+          composer
+          ${{ inputs.composer-command }}
+          ${{ inputs.composer-flags }}
+          ${{
+            inputs.ignore-platform-reqs == 'true'
+            && '--ignore-platform-reqs'
+            || ''
+          }}
+      run: bash -euo pipefail -c "$COMPOSER_INSTALL_COMMAND"

@@ -1,0 +1,332 @@
+---
+name: quality
+
+on:
+  workflow_call:
+    inputs:
+      actionlint-version:
+        description: actionlint version to use.
+        default: 1.7.12
+        required: false
+        type: string
+      checkout_fetch_depth:
+        description: Fetch depth for checkout action.
+        default: 0
+        required: false
+        type: number
+      concurrency-group:
+        description: Concurrency group name.
+        default: quality/${{ github.workflow }}-${{ github.ref }}
+        required: false
+        type: string
+      editorconfig-checker-version:
+        description: EditorConfig Checker version to use.
+        default: v3.7.0
+        required: false
+        type: string
+      enable-concurrency:
+        description: Enable concurrency.
+        default: true
+        required: false
+        type: boolean
+      markdownlint-cli2-version:
+        description: markdownlint-cli2 version to use.
+        default: 0.22.1
+        required: false
+        type: string
+      node-version:
+        description: Node.js version to use.
+        default: 24
+        required: false
+        type: string
+      os:
+        description: OS runner as a JSON array string '["ubuntu-latest"]'.
+        default: '["ubuntu-latest"]'
+        required: false
+        type: string
+      prettier-version:
+        description: Prettier version to use.
+        default: 3.8.4
+        required: false
+        type: string
+      validate_editorconfig:
+        description: Enable EditorConfig validation.
+        default: true
+        required: false
+        type: boolean
+      validate_github_actions:
+        description: Enable GitHub Actions workflow validation with actionlint.
+        default: true
+        required: false
+        type: boolean
+      validate_markdown:
+        description: Enable Markdown validation.
+        default: true
+        required: false
+        type: boolean
+      validate_markdown_prettier:
+        description: Enable Markdown formatting validation with Prettier.
+        default: true
+        required: false
+        type: boolean
+      validate_spell_codespell:
+        description: Enable spelling validation with codespell.
+        default: true
+        required: false
+        type: boolean
+      validate_yaml:
+        description: Enable YAML validation.
+        default: true
+        required: false
+        type: boolean
+      validate_yaml_prettier:
+        description: Enable YAML formatting validation with Prettier.
+        default: true
+        required: false
+        type: boolean
+      yamllint-version:
+        description: yamllint version to use.
+        default: 1.38.0
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  actions:
+    if: ${{ inputs.validate_github_actions }}
+    name: GitHub Actions
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: actions-${{ matrix.os }}-${{ inputs.concurrency-group }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          persist-credentials: false
+
+      - name: Find GitHub Actions workflow files.
+        id: actionlint-files
+        shell: bash
+        run: |
+          shopt -s nullglob
+          files=(.github/workflows/*.yml .github/workflows/*.yaml)
+
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=actionlint skipped::No GitHub Actions workflow files found."
+            exit 0
+          fi
+
+          printf -v files_csv '%s,' "${files[@]}"
+          echo "files=${files_csv%,}" >> "$GITHUB_OUTPUT"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+
+      - name: Run actionlint.
+        if: ${{ steps.actionlint-files.outputs.found == 'true' }}
+        uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2.1.2
+        with:
+          files: ${{ steps.actionlint-files.outputs.files }}
+          flags: -ignore workflow_(repository|sha)
+          version: ${{ inputs.actionlint-version }}
+
+  editorconfig:
+    if: ${{ inputs.validate_editorconfig }}
+    name: EditorConfig
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: editorconfig-${{ matrix.os }}-${{ inputs.concurrency-group }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          persist-credentials: false
+
+      - name: Run EditorConfig Checker.
+        uses: editorconfig-checker/action-editorconfig-checker@840e866d93b8e032123c23bac69dece044d4d84c # v2.2.0
+        with:
+          version: ${{ inputs.editorconfig-checker-version }}
+
+  markdown:
+    if: ${{ inputs.validate_markdown }}
+    name: Markdown
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: markdown-${{ matrix.os }}-${{ inputs.concurrency-group }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          persist-credentials: false
+
+      - name: Set up Node.js.
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Run markdownlint.
+        shell: bash
+        env:
+          MARKDOWNLINT_CLI2_VERSION: ${{ inputs.markdownlint-cli2-version }}
+        run: |
+          config="$(mktemp -d)/.markdownlint-cli2.jsonc"
+          cat > "$config" <<'EOF'
+          {"config":{"MD013":false,"MD033":false}}
+          EOF
+
+          npm exec --yes --package "markdownlint-cli2@$MARKDOWNLINT_CLI2_VERSION" -- \
+            markdownlint-cli2 --config "$config" "**/*.md"
+
+  prettier:
+    if: ${{ inputs.validate_markdown_prettier || inputs.validate_yaml_prettier }}
+    name: Prettier
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: prettier-${{ matrix.os }}-${{ inputs.concurrency-group }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          persist-credentials: false
+
+      - name: Set up Node.js.
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Run Prettier.
+        shell: bash
+        env:
+          PRETTIER_VERSION: ${{ inputs.prettier-version }}
+          VALIDATE_MARKDOWN_PRETTIER: ${{ inputs.validate_markdown_prettier }}
+          VALIDATE_YAML_PRETTIER: ${{ inputs.validate_yaml_prettier }}
+        run: |
+          patterns=()
+
+          if [ "$VALIDATE_MARKDOWN_PRETTIER" = "true" ]; then
+            patterns+=("**/*.md")
+          fi
+
+          if [ "$VALIDATE_YAML_PRETTIER" = "true" ]; then
+            patterns+=("**/*.{yml,yaml}")
+          fi
+
+          npm exec --yes --package "prettier@$PRETTIER_VERSION" -- \
+            prettier --check "${patterns[@]}"
+
+  spelling:
+    if: ${{ inputs.validate_spell_codespell }}
+    name: Spelling
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: spelling-${{ matrix.os }}-${{ inputs.concurrency-group }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          persist-credentials: false
+
+      - name: Run codespell.
+        uses: codespell-project/actions-codespell@8f01853be192eb0f849a5c7d721450e7a467c579 # v2.2
+        with:
+          skip: ./.git
+
+  yaml:
+    if: ${{ inputs.validate_yaml }}
+    name: YAML
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: yaml-${{ matrix.os }}-${{ inputs.concurrency-group }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          persist-credentials: false
+
+      - name: Set up Python.
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.x"
+
+      - name: Install yamllint.
+        shell: bash
+        env:
+          YAMLLINT_VERSION: ${{ inputs.yamllint-version }}
+        run: python -m pip install "yamllint==$YAMLLINT_VERSION"
+
+      - name: Run yamllint.
+        shell: bash
+        run: |
+          targets=()
+
+          if [ -d ".github" ]; then
+            targets+=(".github")
+          fi
+
+          if [ -d "actions" ]; then
+            targets+=("actions")
+          fi
+
+          if [ "${#targets[@]}" -eq 0 ]; then
+            echo "No yamllint targets found (.github/actions); skipping."
+            exit 0
+          fi
+
+          yamllint \
+            -d '{extends: default, rules: {comments: {min-spaces-from-content: 1}, line-length: disable, truthy: disable}}' \
+            "${targets[@]}"

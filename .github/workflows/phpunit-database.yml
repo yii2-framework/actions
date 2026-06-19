@@ -154,6 +154,9 @@ on:
         description: Codecov token.
         required: false
 
+permissions:
+  contents: read
+
 jobs:
   database:
     name: PHP ${{ matrix.php-version }}-${{ inputs.database-type }}-${{ matrix.database-version }}
@@ -193,9 +196,10 @@ jobs:
 
     services:
       database:
-        image: ${{ format('{0}:{1}', inputs.database-image, matrix.database-version) }}
+        image: >- # zizmor: ignore[unpinned-images] Dynamic caller image.
+          ${{ inputs.database-image }}:${{ matrix.database-version }}
         ports:
-          - ${{ format('{0}:{0}', inputs.database-port) }}
+          - ${{ inputs.database-port }}:${{ inputs.database-port }}
         env: ${{ fromJson(inputs.database-env) }}
         options: >-
           --name=database-${{ github.run_id }}
@@ -207,17 +211,30 @@ jobs:
     steps:
       - name: Monitor action permissions.
         if: runner.os != 'Windows'
-        uses: GitHubSecurityLab/actions-permissions/monitor@v1
+        uses: GitHubSecurityLab/actions-permissions/monitor@bf82d13b9b10051d224345ab9184f5ede0a94289 # v1
 
-      - name: Checkout.
-        uses: actions/checkout@v6
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Checkout reusable actions.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .yii2-framework-actions
+          persist-credentials: false
 
       - name: Additional Database Setup.
         if: inputs.setup-commands != ''
-        run: ${{ inputs.setup-commands }}
+        shell: bash
+        env:
+          SETUP_COMMANDS: ${{ inputs.setup-commands }}
+        run: bash -euo pipefail -c "$SETUP_COMMANDS"
 
       - name: Setup PHP Environment.
-        uses: yii2-framework/actions/actions/php-setup@main
+        uses: ./.yii2-framework-actions/actions/php-setup
         with:
           auth-token: ${{ secrets.AUTH_TOKEN }}
           composer-command: ${{ inputs.composer-command }}
@@ -231,7 +248,7 @@ jobs:
           tools: ${{ inputs.tools }}
 
       - name: Run PHPUnit tests with coverage.
-        uses: yii2-framework/actions/actions/phpunit@main
+        uses: ./.yii2-framework-actions/actions/phpunit
         with:
           configuration: ${{ inputs.phpunit-configuration }}
           coverage-driver: ${{ inputs.coverage-driver }}

@@ -75,6 +75,9 @@ on:
         description: GitHub token.
         required: false
 
+permissions:
+  contents: read
+
 jobs:
   composer-require-checker:
     name: PHP ${{ matrix.php-version }}-${{ matrix.os }}
@@ -94,13 +97,23 @@ jobs:
     steps:
       - name: Monitor action permissions.
         if: runner.os != 'Windows'
-        uses: GitHubSecurityLab/actions-permissions/monitor@v1
+        uses: GitHubSecurityLab/actions-permissions/monitor@bf82d13b9b10051d224345ab9184f5ede0a94289 # v1
 
-      - name: Checkout.
-        uses: actions/checkout@v6
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Checkout reusable actions.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .yii2-framework-actions
+          persist-credentials: false
 
       - name: Setup PHP Environment.
-        uses: yii2-framework/actions/actions/php-setup@main
+        uses: ./.yii2-framework-actions/actions/php-setup
         with:
           auth-token: ${{ secrets.AUTH_TOKEN }}
           composer-command: ${{ inputs.composer-command }}
@@ -114,4 +127,9 @@ jobs:
           tools: ${{ inputs.tools }}
 
       - name: Check composer requirements.
-        run: vendor/bin/composer-require-checker ${{ inputs.command-options }}
+        shell: bash
+        env:
+          COMPOSER_REQUIRE_CHECKER_COMMAND: >-
+            vendor/bin/composer-require-checker
+            ${{ inputs.command-options }}
+        run: bash -euo pipefail -c "$COMPOSER_REQUIRE_CHECKER_COMMAND"

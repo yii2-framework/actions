@@ -34,7 +34,8 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 - [`composer-require-checker.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/composer-require-checker.yml) - Dependency validation.
 - [`ecs.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/ecs.yml) - Easy Coding Standard.
 - [`phpstan.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpstan.yml) - Static analysis.
-- [`super-linter.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/super-linter.yml) - Super Linter for multi-language linting.
+- [`quality.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/quality.yml) - Reusable quality checks.
+- [`security.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/security.yml) - Security checks for GitHub Actions and secrets.
 
 ### Utility Actions
 
@@ -45,8 +46,6 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 
 ### Composer Require Checker
 
-<!-- editorconfig-checker-disable -->
-<!-- prettier-ignore-start -->
 ```yaml
 ---
 on:
@@ -68,13 +67,9 @@ jobs:
     with:
       command-options: "--config-file=.composer-require-checker.json"
 ```
-<!-- prettier-ignore-end -->
-<!-- editorconfig-checker-enable -->
 
 ### Easy Coding Standard
 
-<!-- editorconfig-checker-disable -->
-<!-- prettier-ignore-start -->
 ```yaml
 ---
 on:
@@ -97,13 +92,9 @@ jobs:
       command-options: "check --ansi --no-progress-bar"
       php-version: '["8.4"]'
 ```
-<!-- prettier-ignore-end -->
-<!-- editorconfig-checker-enable -->
 
 ### Infection Mutation Testing {#infection}
 
-<!-- editorconfig-checker-disable -->
-<!-- prettier-ignore-start -->
 ```yaml
 ---
 on:
@@ -131,13 +122,9 @@ jobs:
       # PHPStan integration
       phpstan: true
 ```
-<!-- prettier-ignore-end -->
-<!-- editorconfig-checker-enable -->
 
 ### PHPUnit
 
-<!-- editorconfig-checker-disable -->
-<!-- prettier-ignore-start -->
 ```yaml
 ---
 on:
@@ -177,13 +164,9 @@ jobs:
       phpunit-exclude-group: integration
       phpunit-group: unit
 ```
-<!-- prettier-ignore-end -->
-<!-- editorconfig-checker-enable -->
 
 ### PHPUnit with Database
 
-<!-- editorconfig-checker-disable -->
-<!-- prettier-ignore-start -->
 ```yaml
 ---
 on:
@@ -221,8 +204,6 @@ jobs:
         php-version: '["8.4"]'
         phpunit-group: mysql
 ```
-<!-- prettier-ignore-end -->
-<!-- editorconfig-checker-enable -->
 
 **Supported Databases:**
 
@@ -235,8 +216,6 @@ jobs:
 
 ### PHPStan Static Analysis
 
-<!-- editorconfig-checker-disable -->
-<!-- prettier-ignore-start -->
 ```yaml
 ---
 on:
@@ -263,13 +242,9 @@ jobs:
       php-version: '["8.4"]'
       tools: cs2pr
 ```
-<!-- prettier-ignore-end -->
-<!-- editorconfig-checker-enable -->
 
-### Super Linter
+### Linter
 
-<!-- editorconfig-checker-disable -->
-<!-- prettier-ignore-start -->
 ```yaml
 ---
 on:
@@ -280,16 +255,30 @@ name: linter
 
 jobs:
   linter:
-    uses: yii2-framework/actions/.github/workflows/super-linter.yml@main
+    uses: yii2-framework/actions/.github/workflows/quality.yml@main
     permissions:
-      checks: write
       contents: read
-      statuses: write    
-    secrets:
-      AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
-<!-- prettier-ignore-end -->
-<!-- editorconfig-checker-enable -->
+
+### Security
+
+```yaml
+---
+on:
+  - pull_request
+  - push
+
+name: security
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    uses: yii2-framework/actions/.github/workflows/security.yml@main
+    permissions:
+      contents: read
+```
 
 > **Note**: YAML files should use 2-space indentation. This example shows correct YAML syntax - copy it to your `.github/workflows/*.yml` files as-is.
 
@@ -299,7 +288,7 @@ jobs:
 
 ## Quality code
 
-[![Super-Linter](https://img.shields.io/github/actions/workflow/status/yii2-framework/actions/linter.yml?style=for-the-badge&label=Super-Linter&logo=github)](https://github.com/yii2-framework/actions/actions/workflows/linter.yml)
+[![Quality](https://img.shields.io/github/actions/workflow/status/yii2-framework/actions/linter.yml?style=for-the-badge&label=Quality&logo=github)](https://github.com/yii2-framework/actions/actions/workflows/linter.yml)
 
 ## Our social networks
 
