@@ -75,6 +75,9 @@ on:
         description: GitHub token.
         required: false
 
+permissions:
+  contents: read
+
 jobs:
   ecs:
     name: PHP ${{ matrix.php-version }}-${{ matrix.os }}
@@ -94,10 +97,20 @@ jobs:
     steps:
       - name: Monitor action permissions.
         if: runner.os != 'Windows'
-        uses: GitHubSecurityLab/actions-permissions/monitor@v1
+        uses: GitHubSecurityLab/actions-permissions/monitor@bf82d13b9b10051d224345ab9184f5ede0a94289 # v1
 
-      - name: Checkout.
-        uses: actions/checkout@v6
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Checkout reusable actions.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          repository: yii2-framework/actions
+          ref: ${{ github.workflow_sha }}
+          path: .yii2-framework-actions
+          persist-credentials: false
 
       - name: Download ECS config file.
         if: ${{ inputs.download-config }}
@@ -123,7 +136,7 @@ jobs:
           fi
 
       - name: Setup PHP Environment.
-        uses: yii2-framework/actions/actions/php-setup@main
+        uses: ./.yii2-framework-actions/actions/php-setup
         with:
           auth-token: ${{ secrets.AUTH_TOKEN }}
           composer-command: ${{ inputs.composer-command }}
@@ -136,4 +149,9 @@ jobs:
           tools: ${{ inputs.tools }}
 
       - name: Run Easy Coding Standard.
-        run: vendor/bin/ecs ${{ inputs.command-options }}
+        shell: bash
+        env:
+          ECS_COMMAND: >-
+            vendor/bin/ecs
+            ${{ inputs.command-options }}
+        run: bash -euo pipefail -c "$ECS_COMMAND"

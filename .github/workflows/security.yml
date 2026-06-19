@@ -1,0 +1,118 @@
+---
+name: security
+
+on:
+  workflow_call:
+    inputs:
+      audit-inputs:
+        description: Paths or workflow/action inputs passed to zizmor.
+        default: .github actions
+        required: false
+        type: string
+      checkout_fetch_depth:
+        description: Fetch depth for checkout action.
+        default: 0
+        required: false
+        type: number
+      concurrency-group:
+        description: Concurrency group name.
+        default: security/${{ github.workflow }}-${{ github.ref }}
+        required: false
+        type: string
+      enable-concurrency:
+        description: Enable concurrency.
+        default: true
+        required: false
+        type: boolean
+      gitleaks-version:
+        description: Gitleaks version to use.
+        default: 8.30.1
+        required: false
+        type: string
+      os:
+        description: OS runner as a JSON array string '["ubuntu-latest"]'.
+        default: '["ubuntu-latest"]'
+        required: false
+        type: string
+      persona:
+        description: zizmor persona to use while auditing.
+        default: pedantic
+        required: false
+        type: string
+      validate_gitleaks:
+        description: Enable secret scanning with Gitleaks.
+        default: true
+        required: false
+        type: boolean
+      validate_zizmor:
+        description: Enable GitHub Actions security auditing with zizmor.
+        default: true
+        required: false
+        type: boolean
+
+    secrets:
+      GITLEAKS_LICENSE:
+        description: Gitleaks license for organization repositories.
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  actions:
+    if: ${{ inputs.validate_zizmor }}
+    name: GitHub Actions
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: actions-${{ matrix.os }}-${{ inputs.concurrency-group }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          persist-credentials: false
+
+      - name: Run zizmor.
+        uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+        with:
+          advanced-security: false
+          annotations: true
+          inputs: ${{ inputs.audit-inputs }}
+          persona: ${{ inputs.persona }}
+
+  secrets:
+    if: ${{ inputs.validate_gitleaks }}
+    name: Secrets
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+      group: secrets-${{ matrix.os }}-${{ inputs.concurrency-group }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: ${{ inputs.checkout_fetch_depth }}
+          persist-credentials: false
+
+      - name: Run Gitleaks.
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITLEAKS_ENABLE_COMMENTS: false
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITLEAKS_VERSION: ${{ inputs.gitleaks-version }}

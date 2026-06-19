@@ -65,18 +65,18 @@ runs:
     - name: Build PHPUnit command.
       id: build-cmd
       shell: bash
+      env:
+        ADDITIONAL_ARGS: ${{ inputs.additional-args }}
+        CONFIG_INPUT: ${{ inputs.configuration }}
+        COVERAGE_DRIVER: ${{ inputs.coverage-driver }}
+        COVERAGE_FILE: ${{ inputs.coverage-file }}
+        COVERAGE_FORMAT: ${{ inputs.coverage-format }}
+        DEBUG_INPUT: ${{ inputs.debug }}
+        EXCLUDE_GROUP_INPUT: ${{ inputs.exclude-group }}
+        GROUP_INPUT: ${{ inputs.group }}
+        PATH_INPUT: ${{ inputs.path }}
+        SUITE_INPUT: ${{ inputs.test-suite }}
       run: |
-        PATH_INPUT="${{ inputs.path }}"
-        CONFIG_INPUT="${{ inputs.configuration }}"
-        SUITE_INPUT="${{ inputs.test-suite }}"
-        GROUP_INPUT="${{ inputs.group }}"
-        EXCLUDE_GROUP_INPUT="${{ inputs.exclude-group }}"
-        DEBUG_INPUT="${{ inputs.debug }}"
-        ADDITIONAL_ARGS="${{ inputs.additional-args }}"
-        COVERAGE_DRIVER="${{ inputs.coverage-driver }}"
-        COVERAGE_FORMAT="${{ inputs.coverage-format }}"
-        COVERAGE_FILE="${{ inputs.coverage-file }}"
-
         PHPUNIT_CMD="$PATH_INPUT --colors=always"
 
         add_param() {
@@ -102,29 +102,33 @@ runs:
           PHPUNIT_CMD="$PHPUNIT_CMD $ADDITIONAL_ARGS"
         fi
 
-        echo "command=$PHPUNIT_CMD" >> $GITHUB_OUTPUT
+        echo "command=$PHPUNIT_CMD" >> "$GITHUB_OUTPUT"
         echo "PHPUnit command: $PHPUNIT_CMD"
 
     - name: Run PHPUnit tests on Linux.
       shell: bash
       if: runner.os != 'Windows'
-      run: ${{ steps.build-cmd.outputs.command }}
+      env:
+        PHPUNIT_COMMAND: ${{ steps.build-cmd.outputs.command }}
+      run: bash -euo pipefail -c "$PHPUNIT_COMMAND"
 
     - name: Run PHPUnit tests on Windows.
       shell: pwsh
       if: runner.os == 'Windows'
-      run: Invoke-Expression "${{ steps.build-cmd.outputs.command }}"
+      env:
+        PHPUNIT_COMMAND: ${{ steps.build-cmd.outputs.command }}
+      run: Invoke-Expression "$env:PHPUNIT_COMMAND"
 
     - name: Upload test results to Codecov.
       if: ${{ !cancelled() && inputs.coverage-driver != 'none' }}
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
       with:
         token: ${{ inputs.coverage-token }}
         report_type: test_results
 
     - name: Upload coverage to Codecov.
       if: ${{ !cancelled() && inputs.coverage-driver != 'none' }}
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
       with:
         token: ${{ inputs.coverage-token }}
         files: ./${{ inputs.coverage-file }}
