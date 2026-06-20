@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.1 Under development
 
+- ci(actions): add configurable quality and security reusable workflows backed by valid composite quality actions with default noise reduction and clearer check names.
+
 ## v2.0.0 June 20, 2026
 
 - ci(actions)!: replace Super-Linter with reusable quality and security workflows.

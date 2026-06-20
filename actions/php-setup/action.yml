@@ -7,12 +7,10 @@ inputs:
     description: GitHub token.
     default:
     required: false
-    type: string
   composer-command:
     description: Composer command (install or update) to run.
     default: update
     required: false
-    type: string
   composer-flags:
     description: Additional composer flags
     default: >-
@@ -22,42 +20,34 @@ inputs:
       --optimize-autoloader
       --ansi
     required: false
-    type: string
   composer-version:
     description: Composer version to use.
     default:
     required: false
-    type: string
   coverage-driver:
     description: Code coverage driver to use (pcov, xdebug).
     default: pcov
     required: false
-    type: string
   extensions:
     description: List of extensions to PHP.
     default:
     required: false
-    type: string
   ignore-platform-reqs:
     description: Whether to add --ignore-platform-reqs to composer command.
     default: false
     required: false
-    type: boolean
   ini-values:
     description: Initial values for PHP configuration.
     default: date.timezone='UTC'
     required: false
-    type: string
   php-version:
     description: PHP version to install (for example, "8.4").
     default: "8.4"
     required: false
-    type: string
   tools:
     description: Tools to test, separated by comma.
     default:
     required: false
-    type: string
 
 runs:
   using: composite

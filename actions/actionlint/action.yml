@@ -1,0 +1,49 @@
+---
+name: actionlint.
+description: Run actionlint with repository defaults for reusable workflows.
+
+inputs:
+  config:
+    description: Path to actionlint configuration file.
+    default: ""
+    required: false
+  flags:
+    description: Additional actionlint command flags.
+    default: ""
+    required: false
+  version:
+    description: actionlint version to use.
+    default: 1.7.12
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Find GitHub Actions workflow files.
+      id: actionlint-files
+      shell: bash
+      run: |
+        shopt -s nullglob
+        files=(.github/workflows/*.yml .github/workflows/*.yaml)
+
+        if [ "${#files[@]}" -eq 0 ]; then
+          echo "found=false" >> "$GITHUB_OUTPUT"
+          echo "::notice title=actionlint skipped::No GitHub Actions workflow files found."
+          exit 0
+        fi
+
+        printf -v files_csv '%s,' "${files[@]}"
+        echo "files=${files_csv%,}" >> "$GITHUB_OUTPUT"
+        echo "found=true" >> "$GITHUB_OUTPUT"
+
+    - name: Run actionlint.
+      if: ${{ steps.actionlint-files.outputs.found == 'true' }}
+      uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2.1.2
+      with:
+        files: ${{ steps.actionlint-files.outputs.files }}
+        flags: >-
+          -ignore workflow_(repository|sha)
+          -ignore ^"(pull_request|push)"\s+section\s+is\s+alias\s+node\s+but\s+mapping\s+node\s+is\s+expected$
+          ${{ inputs.config != '' && format('-config-file {0}', inputs.config) || '' }}
+          ${{ inputs.flags }}
+        version: ${{ inputs.version }}

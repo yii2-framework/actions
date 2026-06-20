@@ -1,0 +1,82 @@
+---
+name: yamllint.
+description: Run yamllint with repository defaults for reusable workflows.
+
+inputs:
+  config:
+    description: Path to yamllint configuration file.
+    default: ""
+    required: false
+  ignore:
+    description: Newline-separated yamllint ignore patterns used with the default configuration.
+    default: ""
+    required: false
+  targets:
+    description: Newline-separated yamllint targets.
+    default: |-
+      .github
+      actions
+    required: false
+  version:
+    description: yamllint version to use.
+    default: 1.38.0
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python.
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      with:
+        python-version: "3.x"
+
+    - name: Install yamllint.
+      shell: bash
+      env:
+        YAMLLINT_VERSION: ${{ inputs.version }}
+      run: python -m pip install "yamllint==$YAMLLINT_VERSION"
+
+    - name: Run yamllint.
+      shell: bash
+      env:
+        YAMLLINT_CONFIG: ${{ inputs.config }}
+        YAMLLINT_IGNORE: ${{ inputs.ignore }}
+        YAMLLINT_TARGETS: ${{ inputs.targets }}
+      run: |
+        args=()
+        targets=()
+
+        if [ -n "$YAMLLINT_CONFIG" ]; then
+          args+=("-c" "$YAMLLINT_CONFIG")
+        else
+          config="$(mktemp -d)/.yamllint.yml"
+          cat > "$config" <<'EOF'
+        extends: default
+        rules:
+          comments:
+            min-spaces-from-content: 1
+          line-length: disable
+          truthy: disable
+        ignore: |
+          .yii2-framework-actions/
+        EOF
+
+          if [ -n "$YAMLLINT_IGNORE" ]; then
+            sed 's/^/  /' <<< "$YAMLLINT_IGNORE" >> "$config"
+          fi
+
+          args+=("-c" "$config")
+        fi
+
+        while IFS= read -r target; do
+          if [ -n "$target" ] && [ -e "$target" ]; then
+            targets+=("$target")
+          fi
+        done <<< "$YAMLLINT_TARGETS"
+
+        if [ "${#targets[@]}" -eq 0 ]; then
+          echo "No yamllint targets found; skipping."
+          exit 0
+        fi
+
+        yamllint "${args[@]}" "${targets[@]}"
