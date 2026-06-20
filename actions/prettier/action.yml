@@ -7,42 +7,34 @@ inputs:
     description: Path to Prettier configuration file.
     default: ""
     required: false
-    type: string
   ignore-path:
     description: Path to Prettier ignore file.
     default: ""
     required: false
-    type: string
   no-error-on-unmatched-pattern:
     description: Do not fail when a Prettier pattern matches no files.
     default: true
     required: false
-    type: boolean
   node-version:
     description: Node.js version to use.
     default: 24
     required: false
-    type: string
   patterns:
     description: Newline-separated Prettier file patterns. Overrides default Markdown/YAML patterns when set.
     default: ""
     required: false
-    type: string
   validate-markdown:
     description: Enable Markdown formatting validation with Prettier.
     default: true
     required: false
-    type: boolean
   validate-yaml:
     description: Enable YAML formatting validation with Prettier.
     default: true
     required: false
-    type: boolean
   version:
     description: Prettier version to use.
     default: 3.8.4
     required: false
-    type: string
 
 runs:
   using: composite

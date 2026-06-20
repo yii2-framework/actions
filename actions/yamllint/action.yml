@@ -7,24 +7,20 @@ inputs:
     description: Path to yamllint configuration file.
     default: ""
     required: false
-    type: string
   ignore:
     description: Newline-separated yamllint ignore patterns used with the default configuration.
     default: ""
     required: false
-    type: string
   targets:
     description: Newline-separated yamllint targets.
     default: |-
       .github
       actions
     required: false
-    type: string
   version:
     description: yamllint version to use.
     default: 1.38.0
     required: false
-    type: string
 
 runs:
   using: composite

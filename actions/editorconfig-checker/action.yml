@@ -7,17 +7,14 @@ inputs:
     description: Path to EditorConfig Checker configuration file.
     default: ""
     required: false
-    type: string
   exclude:
     description: Regular expression for paths excluded by EditorConfig Checker.
     default: ""
     required: false
-    type: string
   version:
     description: EditorConfig Checker version to use.
     default: v3.7.0
     required: false
-    type: string
 
 runs:
   using: composite

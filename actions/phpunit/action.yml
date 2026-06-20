@@ -7,57 +7,46 @@ inputs:
     description: Additional PHPUnit arguments.
     default: "--log-junit junit.xml"
     required: false
-    type: string
   configuration:
     description: PHPUnit configuration file.
     default: ""
     required: false
-    type: string
   coverage-driver:
     description: Code coverage driver to use (pcov, xdebug, none).
     default: ""
     required: false
-    type: string
   coverage-file:
     description: Coverage output file name.
     default: coverage.xml
     required: false
-    type: string
   coverage-format:
     description: Coverage report format (clover, html, xml).
     default: clover
     required: false
-    type: string
   coverage-token:
     description: Codecov token for uploading coverage.
     default: ""
     required: false
-    type: string
   debug:
     description: Display warnings in phpunit.
     default: ""
     required: false
-    type: string
   exclude-group:
     description: Exclude group from phpunit.
     default: ""
     required: false
-    type: string
   group:
     description: Include specific group in phpunit.
     default: ""
     required: false
-    type: string
   path:
     description: Path to PHPUnit executable.
     default: vendor/bin/phpunit
     required: false
-    type: string
   test-suite:
     description: Specific test suite to run.
     default: ""
     required: false
-    type: string
 
 runs:
   using: composite

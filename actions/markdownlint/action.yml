@@ -7,22 +7,18 @@ inputs:
     description: Path to markdownlint-cli2 configuration file.
     default: ""
     required: false
-    type: string
   globs:
     description: Newline-separated markdownlint-cli2 glob patterns.
     default: "**/*.md"
     required: false
-    type: string
   node-version:
     description: Node.js version to use.
     default: 24
     required: false
-    type: string
   version:
     description: markdownlint-cli2 version to use.
     default: 0.22.1
     required: false
-    type: string
 
 runs:
   using: composite

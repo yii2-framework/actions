@@ -188,7 +188,7 @@ permissions:
 jobs:
   actions:
     if: ${{ inputs.validate_github_actions }}
-    name: GitHub Actions
+    name: Actionlint
     runs-on: ${{ matrix.os }}
 
     concurrency:

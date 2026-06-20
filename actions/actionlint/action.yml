@@ -7,17 +7,14 @@ inputs:
     description: Path to actionlint configuration file.
     default: ""
     required: false
-    type: string
   flags:
     description: Additional actionlint command flags.
     default: ""
     required: false
-    type: string
   version:
     description: actionlint version to use.
     default: 1.7.12
     required: false
-    type: string
 
 runs:
   using: composite

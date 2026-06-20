@@ -7,27 +7,22 @@ inputs:
     description: Path to codespell configuration file.
     default: ""
     required: false
-    type: string
   ignore-words-file:
     description: Path to codespell ignored words file.
     default: ""
     required: false
-    type: string
   ignore-words-list:
     description: Comma-separated list of words ignored by codespell.
     default: ""
     required: false
-    type: string
   path:
     description: Path passed to codespell.
     default: ""
     required: false
-    type: string
   skip:
     description: Comma-separated list of files or globs skipped by codespell.
     default: ./.git
     required: false
-    type: string
 
 runs:
   using: composite
