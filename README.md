@@ -39,8 +39,14 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 
 ### Utility Actions
 
+- [`actionlint`](https://github.com/yii2-framework/actions/blob/main/actions/actionlint/action.yml) - GitHub Actions workflow linting.
+- [`codespell`](https://github.com/yii2-framework/actions/blob/main/actions/codespell/action.yml) - Spelling validation.
+- [`editorconfig-checker`](https://github.com/yii2-framework/actions/blob/main/actions/editorconfig-checker/action.yml) - EditorConfig validation.
+- [`markdownlint`](https://github.com/yii2-framework/actions/blob/main/actions/markdownlint/action.yml) - Markdown validation.
 - [`php-setup`](https://github.com/yii2-framework/actions/blob/main/actions/php-setup/action.yml) - PHP environment setup.
 - [`phpunit-runner`](https://github.com/yii2-framework/actions/blob/main/actions/phpunit/action.yml) - Advanced PHPUnit execution.
+- [`prettier`](https://github.com/yii2-framework/actions/blob/main/actions/prettier/action.yml) - Markdown and YAML formatting validation.
+- [`yamllint`](https://github.com/yii2-framework/actions/blob/main/actions/yamllint/action.yml) - YAML validation.
 
 ## Quick start
 
@@ -258,6 +264,16 @@ jobs:
     uses: yii2-framework/actions/.github/workflows/quality.yml@main
     permissions:
       contents: read
+    # Optional configuration and ignore paths, including former .github/linters files.
+    # with:
+    #   actionlint-config: .github/linters/actionlint.yml
+    #   codespell-config: .github/linters/.codespellrc
+    #   codespell-ignore-words-file: .github/linters/codespell-ignored-words.txt
+    #   editorconfig-checker-config: .github/linters/.editorconfig-checker.json
+    #   markdownlint-config: .github/linters/.markdown-lint.yml
+    #   prettier-config: .github/linters/.prettierrc
+    #   prettier-ignore-path: .github/linters/.prettierignore
+    #   yamllint-config: .github/linters/.yaml-lint.yml
 ```
 
 ### Security
@@ -278,6 +294,10 @@ jobs:
     uses: yii2-framework/actions/.github/workflows/security.yml@main
     permissions:
       contents: read
+    # Optional configuration and ignore paths, including former .github/linters files.
+    # with:
+    #   gitleaks-config: .github/linters/.gitleaks.toml
+    #   zizmor-config: .github/linters/zizmor.yml
 ```
 
 > **Note**: YAML files should use 2-space indentation. This example shows correct YAML syntax - copy it to your `.github/workflows/*.yml` files as-is.

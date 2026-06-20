@@ -9,11 +9,46 @@ on:
         default: 1.7.12
         required: false
         type: string
+      actionlint-config:
+        description: Path to actionlint configuration file.
+        default: ""
+        required: false
+        type: string
+      actionlint-flags:
+        description: Additional actionlint command flags.
+        default: ""
+        required: false
+        type: string
       checkout_fetch_depth:
         description: Fetch depth for checkout action.
         default: 0
         required: false
         type: number
+      codespell-config:
+        description: Path to codespell configuration file.
+        default: ""
+        required: false
+        type: string
+      codespell-ignore-words-file:
+        description: Path to codespell ignored words file.
+        default: ""
+        required: false
+        type: string
+      codespell-ignore-words-list:
+        description: Comma-separated list of words ignored by codespell.
+        default: ""
+        required: false
+        type: string
+      codespell-path:
+        description: Path passed to codespell.
+        default: ""
+        required: false
+        type: string
+      codespell-skip:
+        description: Comma-separated list of files or globs skipped by codespell.
+        default: ./.git
+        required: false
+        type: string
       concurrency-group:
         description: Concurrency group name.
         default: quality/${{ github.workflow }}-${{ github.ref }}
@@ -24,6 +59,16 @@ on:
         default: v3.7.0
         required: false
         type: string
+      editorconfig-checker-config:
+        description: Path to EditorConfig Checker configuration file.
+        default: ""
+        required: false
+        type: string
+      editorconfig-checker-exclude:
+        description: Regular expression for paths excluded by EditorConfig Checker.
+        default: ""
+        required: false
+        type: string
       enable-concurrency:
         description: Enable concurrency.
         default: true
@@ -32,6 +77,16 @@ on:
       markdownlint-cli2-version:
         description: markdownlint-cli2 version to use.
         default: 0.22.1
+        required: false
+        type: string
+      markdownlint-config:
+        description: Path to markdownlint-cli2 configuration file.
+        default: ""
+        required: false
+        type: string
+      markdownlint-globs:
+        description: Newline-separated markdownlint-cli2 glob patterns.
+        default: "**/*.md"
         required: false
         type: string
       node-version:
@@ -47,6 +102,26 @@ on:
       prettier-version:
         description: Prettier version to use.
         default: 3.8.4
+        required: false
+        type: string
+      prettier-config:
+        description: Path to Prettier configuration file.
+        default: ""
+        required: false
+        type: string
+      prettier-ignore-path:
+        description: Path to Prettier ignore file.
+        default: ""
+        required: false
+        type: string
+      prettier-no-error-on-unmatched-pattern:
+        description: Do not fail when a Prettier pattern matches no files.
+        default: true
+        required: false
+        type: boolean
+      prettier-patterns:
+        description: Newline-separated Prettier file patterns. Overrides default Markdown/YAML patterns when set.
+        default: ""
         required: false
         type: string
       validate_editorconfig:
@@ -89,6 +164,23 @@ on:
         default: 1.38.0
         required: false
         type: string
+      yamllint-config:
+        description: Path to yamllint configuration file.
+        default: ""
+        required: false
+        type: string
+      yamllint-ignore:
+        description: Newline-separated yamllint ignore patterns used with the default configuration.
+        default: ""
+        required: false
+        type: string
+      yamllint-targets:
+        description: Newline-separated yamllint targets.
+        default: |-
+          .github
+          actions
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -115,29 +207,19 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Find GitHub Actions workflow files.
-        id: actionlint-files
-        shell: bash
-        run: |
-          shopt -s nullglob
-          files=(.github/workflows/*.yml .github/workflows/*.yaml)
-
-          if [ "${#files[@]}" -eq 0 ]; then
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=actionlint skipped::No GitHub Actions workflow files found."
-            exit 0
-          fi
-
-          printf -v files_csv '%s,' "${files[@]}"
-          echo "files=${files_csv%,}" >> "$GITHUB_OUTPUT"
-          echo "found=true" >> "$GITHUB_OUTPUT"
+      - name: Checkout reusable actions.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .yii2-framework-actions
+          persist-credentials: false
 
       - name: Run actionlint.
-        if: ${{ steps.actionlint-files.outputs.found == 'true' }}
-        uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2.1.2
+        uses: ./.yii2-framework-actions/actions/actionlint
         with:
-          files: ${{ steps.actionlint-files.outputs.files }}
-          flags: -ignore workflow_(repository|sha)
+          config: ${{ inputs.actionlint-config }}
+          flags: ${{ inputs.actionlint-flags }}
           version: ${{ inputs.actionlint-version }}
 
   editorconfig:
@@ -161,9 +243,19 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Run EditorConfig Checker.
-        uses: editorconfig-checker/action-editorconfig-checker@840e866d93b8e032123c23bac69dece044d4d84c # v2.2.0
+      - name: Checkout reusable actions.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .yii2-framework-actions
+          persist-credentials: false
+
+      - name: Run EditorConfig Checker.
+        uses: ./.yii2-framework-actions/actions/editorconfig-checker
+        with:
+          config: ${{ inputs.editorconfig-checker-config }}
+          exclude: ${{ inputs.editorconfig-checker-exclude }}
           version: ${{ inputs.editorconfig-checker-version }}
 
   markdown:
@@ -187,23 +279,21 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Set up Node.js.
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      - name: Checkout reusable actions.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          node-version: ${{ inputs.node-version }}
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .yii2-framework-actions
+          persist-credentials: false
 
       - name: Run markdownlint.
-        shell: bash
-        env:
-          MARKDOWNLINT_CLI2_VERSION: ${{ inputs.markdownlint-cli2-version }}
-        run: |
-          config="$(mktemp -d)/.markdownlint-cli2.jsonc"
-          cat > "$config" <<'EOF'
-          {"config":{"MD013":false,"MD033":false}}
-          EOF
-
-          npm exec --yes --package "markdownlint-cli2@$MARKDOWNLINT_CLI2_VERSION" -- \
-            markdownlint-cli2 --config "$config" "**/*.md"
+        uses: ./.yii2-framework-actions/actions/markdownlint
+        with:
+          config: ${{ inputs.markdownlint-config }}
+          globs: ${{ inputs.markdownlint-globs }}
+          node-version: ${{ inputs.node-version }}
+          version: ${{ inputs.markdownlint-cli2-version }}
 
   prettier:
     if: ${{ inputs.validate_markdown_prettier || inputs.validate_yaml_prettier }}
@@ -226,30 +316,25 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Set up Node.js.
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      - name: Checkout reusable actions.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          node-version: ${{ inputs.node-version }}
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .yii2-framework-actions
+          persist-credentials: false
 
       - name: Run Prettier.
-        shell: bash
-        env:
-          PRETTIER_VERSION: ${{ inputs.prettier-version }}
-          VALIDATE_MARKDOWN_PRETTIER: ${{ inputs.validate_markdown_prettier }}
-          VALIDATE_YAML_PRETTIER: ${{ inputs.validate_yaml_prettier }}
-        run: |
-          patterns=()
-
-          if [ "$VALIDATE_MARKDOWN_PRETTIER" = "true" ]; then
-            patterns+=("**/*.md")
-          fi
-
-          if [ "$VALIDATE_YAML_PRETTIER" = "true" ]; then
-            patterns+=("**/*.{yml,yaml}")
-          fi
-
-          npm exec --yes --package "prettier@$PRETTIER_VERSION" -- \
-            prettier --check "${patterns[@]}"
+        uses: ./.yii2-framework-actions/actions/prettier
+        with:
+          config: ${{ inputs.prettier-config }}
+          ignore-path: ${{ inputs.prettier-ignore-path }}
+          no-error-on-unmatched-pattern: ${{ inputs.prettier-no-error-on-unmatched-pattern }}
+          node-version: ${{ inputs.node-version }}
+          patterns: ${{ inputs.prettier-patterns }}
+          validate-markdown: ${{ inputs.validate_markdown_prettier }}
+          validate-yaml: ${{ inputs.validate_yaml_prettier }}
+          version: ${{ inputs.prettier-version }}
 
   spelling:
     if: ${{ inputs.validate_spell_codespell }}
@@ -272,10 +357,22 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Run codespell.
-        uses: codespell-project/actions-codespell@8f01853be192eb0f849a5c7d721450e7a467c579 # v2.2
+      - name: Checkout reusable actions.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          skip: ./.git
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .yii2-framework-actions
+          persist-credentials: false
+
+      - name: Run codespell.
+        uses: ./.yii2-framework-actions/actions/codespell
+        with:
+          config: ${{ inputs.codespell-config }}
+          ignore-words-file: ${{ inputs.codespell-ignore-words-file }}
+          ignore-words-list: ${{ inputs.codespell-ignore-words-list }}
+          path: ${{ inputs.codespell-path }}
+          skip: ${{ inputs.codespell-skip }}
 
   yaml:
     if: ${{ inputs.validate_yaml }}
@@ -298,35 +395,18 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Set up Python.
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      - name: Checkout reusable actions.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          python-version: "3.x"
-
-      - name: Install yamllint.
-        shell: bash
-        env:
-          YAMLLINT_VERSION: ${{ inputs.yamllint-version }}
-        run: python -m pip install "yamllint==$YAMLLINT_VERSION"
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .yii2-framework-actions
+          persist-credentials: false
 
       - name: Run yamllint.
-        shell: bash
-        run: |
-          targets=()
-
-          if [ -d ".github" ]; then
-            targets+=(".github")
-          fi
-
-          if [ -d "actions" ]; then
-            targets+=("actions")
-          fi
-
-          if [ "${#targets[@]}" -eq 0 ]; then
-            echo "No yamllint targets found (.github/actions); skipping."
-            exit 0
-          fi
-
-          yamllint \
-            -d '{extends: default, rules: {comments: {min-spaces-from-content: 1}, line-length: disable, truthy: disable}}' \
-            "${targets[@]}"
+        uses: ./.yii2-framework-actions/actions/yamllint
+        with:
+          config: ${{ inputs.yamllint-config }}
+          ignore: ${{ inputs.yamllint-ignore }}
+          targets: ${{ inputs.yamllint-targets }}
+          version: ${{ inputs.yamllint-version }}

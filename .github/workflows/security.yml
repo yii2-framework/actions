@@ -29,6 +29,21 @@ on:
         default: 8.30.1
         required: false
         type: string
+      gitleaks-config:
+        description: Path to Gitleaks configuration file.
+        default: ""
+        required: false
+        type: string
+      gitleaks-enable-summary:
+        description: Enable Gitleaks job summary.
+        default: true
+        required: false
+        type: boolean
+      gitleaks-enable-upload-artifact:
+        description: Enable Gitleaks SARIF artifact upload.
+        default: true
+        required: false
+        type: boolean
       os:
         description: OS runner as a JSON array string '["ubuntu-latest"]'.
         default: '["ubuntu-latest"]'
@@ -39,6 +54,31 @@ on:
         default: pedantic
         required: false
         type: string
+      zizmor-config:
+        description: Path to zizmor configuration file.
+        default: ""
+        required: false
+        type: string
+      zizmor-fail-on-no-inputs:
+        description: Whether zizmor should fail when no inputs are collected.
+        default: true
+        required: false
+        type: boolean
+      zizmor-min-confidence:
+        description: Minimum zizmor confidence level to report.
+        default: ""
+        required: false
+        type: string
+      zizmor-min-severity:
+        description: Minimum zizmor severity level to report.
+        default: ""
+        required: false
+        type: string
+      zizmor-online-audits:
+        description: Whether zizmor should run online audits.
+        default: true
+        required: false
+        type: boolean
       validate_gitleaks:
         description: Enable secret scanning with Gitleaks.
         default: true
@@ -100,7 +140,10 @@ jobs:
         uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          GITLEAKS_CONFIG: ${{ inputs.gitleaks-config }}
           GITLEAKS_ENABLE_COMMENTS: false
+          GITLEAKS_ENABLE_SUMMARY: ${{ inputs.gitleaks-enable-summary }}
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: ${{ inputs.gitleaks-enable-upload-artifact }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
           GITLEAKS_VERSION: ${{ inputs.gitleaks-version }}
 
@@ -130,5 +173,10 @@ jobs:
         with:
           advanced-security: false
           annotations: true
+          config: ${{ inputs.zizmor-config }}
+          fail-on-no-inputs: ${{ inputs.zizmor-fail-on-no-inputs }}
           inputs: ${{ inputs.audit-inputs }}
+          min-confidence: ${{ inputs.zizmor-min-confidence }}
+          min-severity: ${{ inputs.zizmor-min-severity }}
+          online-audits: ${{ inputs.zizmor-online-audits }}
           persona: ${{ inputs.persona }}

@@ -1,0 +1,49 @@
+---
+name: EditorConfig Checker.
+description: Run EditorConfig Checker with repository defaults for reusable workflows.
+
+inputs:
+  config:
+    description: Path to EditorConfig Checker configuration file.
+    default: ""
+    required: false
+    type: string
+  exclude:
+    description: Regular expression for paths excluded by EditorConfig Checker.
+    default: ""
+    required: false
+    type: string
+  version:
+    description: EditorConfig Checker version to use.
+    default: v3.7.0
+    required: false
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Set up EditorConfig Checker.
+      uses: editorconfig-checker/action-editorconfig-checker@840e866d93b8e032123c23bac69dece044d4d84c # v2.2.0
+      with:
+        version: ${{ inputs.version }}
+
+    - name: Run EditorConfig Checker.
+      shell: bash
+      env:
+        EDITORCONFIG_CHECKER_CONFIG: ${{ inputs.config }}
+        EDITORCONFIG_CHECKER_EXCLUDE: ${{ inputs.exclude }}
+      run: |
+        args=()
+        default_exclude='(^|/)\.yii2-framework-actions/'
+
+        if [ -n "$EDITORCONFIG_CHECKER_CONFIG" ]; then
+          args+=("-config" "$EDITORCONFIG_CHECKER_CONFIG")
+        fi
+
+        if [ -n "$EDITORCONFIG_CHECKER_EXCLUDE" ]; then
+          args+=("-exclude" "$default_exclude|$EDITORCONFIG_CHECKER_EXCLUDE")
+        else
+          args+=("-exclude" "$default_exclude")
+        fi
+
+        editorconfig-checker "${args[@]}"

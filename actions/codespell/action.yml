@@ -1,0 +1,42 @@
+---
+name: codespell.
+description: Run codespell with repository defaults for reusable workflows.
+
+inputs:
+  config:
+    description: Path to codespell configuration file.
+    default: ""
+    required: false
+    type: string
+  ignore-words-file:
+    description: Path to codespell ignored words file.
+    default: ""
+    required: false
+    type: string
+  ignore-words-list:
+    description: Comma-separated list of words ignored by codespell.
+    default: ""
+    required: false
+    type: string
+  path:
+    description: Path passed to codespell.
+    default: ""
+    required: false
+    type: string
+  skip:
+    description: Comma-separated list of files or globs skipped by codespell.
+    default: ./.git
+    required: false
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Run codespell.
+      uses: codespell-project/actions-codespell@8f01853be192eb0f849a5c7d721450e7a467c579 # v2.2
+      with:
+        config: ${{ inputs.config }}
+        ignore_words_file: ${{ inputs.ignore-words-file }}
+        ignore_words_list: ${{ inputs.ignore-words-list }}
+        path: ${{ inputs.path }}
+        skip: ${{ inputs.skip != '' && format('./.yii2-framework-actions,{0}', inputs.skip) || './.yii2-framework-actions' }}

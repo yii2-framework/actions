@@ -1,0 +1,107 @@
+---
+name: Prettier.
+description: Run Prettier with repository defaults for reusable workflows.
+
+inputs:
+  config:
+    description: Path to Prettier configuration file.
+    default: ""
+    required: false
+    type: string
+  ignore-path:
+    description: Path to Prettier ignore file.
+    default: ""
+    required: false
+    type: string
+  no-error-on-unmatched-pattern:
+    description: Do not fail when a Prettier pattern matches no files.
+    default: true
+    required: false
+    type: boolean
+  node-version:
+    description: Node.js version to use.
+    default: 24
+    required: false
+    type: string
+  patterns:
+    description: Newline-separated Prettier file patterns. Overrides default Markdown/YAML patterns when set.
+    default: ""
+    required: false
+    type: string
+  validate-markdown:
+    description: Enable Markdown formatting validation with Prettier.
+    default: true
+    required: false
+    type: boolean
+  validate-yaml:
+    description: Enable YAML formatting validation with Prettier.
+    default: true
+    required: false
+    type: boolean
+  version:
+    description: Prettier version to use.
+    default: 3.8.4
+    required: false
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js.
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Run Prettier.
+      shell: bash
+      env:
+        PRETTIER_VERSION: ${{ inputs.version }}
+        PRETTIER_CONFIG: ${{ inputs.config }}
+        PRETTIER_IGNORE_PATH: ${{ inputs.ignore-path }}
+        PRETTIER_NO_ERROR_ON_UNMATCHED_PATTERN: ${{ inputs.no-error-on-unmatched-pattern }}
+        PRETTIER_PATTERNS: ${{ inputs.patterns }}
+        VALIDATE_MARKDOWN_PRETTIER: ${{ inputs.validate-markdown }}
+        VALIDATE_YAML_PRETTIER: ${{ inputs.validate-yaml }}
+      run: |
+        args=("--check")
+        patterns=()
+
+        default_ignore="$(mktemp)"
+        echo ".yii2-framework-actions" > "$default_ignore"
+        args+=("--ignore-path" "$default_ignore")
+
+        if [ -n "$PRETTIER_CONFIG" ]; then
+          args+=("--config" "$PRETTIER_CONFIG")
+        fi
+
+        if [ -n "$PRETTIER_IGNORE_PATH" ]; then
+          args+=("--ignore-path" "$PRETTIER_IGNORE_PATH")
+        fi
+
+        if [ "$PRETTIER_NO_ERROR_ON_UNMATCHED_PATTERN" = "true" ]; then
+          args+=("--no-error-on-unmatched-pattern")
+        fi
+
+        if [ -n "$PRETTIER_PATTERNS" ]; then
+          while IFS= read -r pattern; do
+            if [ -n "$pattern" ]; then
+              patterns+=("$pattern")
+            fi
+          done <<< "$PRETTIER_PATTERNS"
+        else
+          if [ "$VALIDATE_MARKDOWN_PRETTIER" = "true" ]; then
+            patterns+=("**/*.md")
+          fi
+
+          if [ "$VALIDATE_YAML_PRETTIER" = "true" ]; then
+            patterns+=("**/*.{yml,yaml}")
+          fi
+        fi
+
+        if [ "${#patterns[@]}" -eq 0 ]; then
+          echo "No Prettier patterns configured; skipping."
+          exit 0
+        fi
+
+        npm exec --yes --package "prettier@$PRETTIER_VERSION" -- \
+          prettier "${args[@]}" "${patterns[@]}"
