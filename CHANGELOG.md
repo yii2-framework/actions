@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.0.1 Under development
+## v2.0.1 October 20, 2026
 
 - ci(actions): add configurable quality and security reusable workflows backed by valid composite quality actions with default noise reduction and clearer check names.
 - ci(actions): remove runtime GitHub token permission monitor steps from reusable workflows now that permissions are explicit.
 - build(deps): update actions/checkout to v7.0.1 across reusable workflows and composite actions.
+- ci(actions): use `$/` self-repository syntax, restore pinned action version comments, apply Dependabot updates and clarify codespell `skip`.
 
 ## v2.0.0 June 20, 2026
 
