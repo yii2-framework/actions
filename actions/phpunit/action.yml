@@ -110,14 +110,14 @@ runs:
 
     - name: Upload test results to Codecov.
       if: ${{ !cancelled() && inputs.coverage-driver != 'none' }}
-      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
+      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
       with:
         token: ${{ inputs.coverage-token }}
         report_type: test_results
 
     - name: Upload coverage to Codecov.
       if: ${{ !cancelled() && inputs.coverage-driver != 'none' }}
-      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
+      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
       with:
         token: ${{ inputs.coverage-token }}
         files: ./${{ inputs.coverage-file }}

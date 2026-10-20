@@ -148,16 +148,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Checkout reusable actions.
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ job.workflow_repository }}
-          ref: ${{ job.workflow_sha }}
-          path: .yii2-framework-actions
-          persist-credentials: false
-
       - name: Setup PHP Environment.
-        uses: ./.yii2-framework-actions/actions/php-setup
+        uses: $/actions/php-setup
         with:
           auth-token: ${{ secrets.AUTH_TOKEN }}
           composer-command: ${{ inputs.composer-command }}
@@ -178,7 +170,7 @@ jobs:
         run: bash -euo pipefail -c "$HOOK"
 
       - name: Run PHPUnit tests with coverage.
-        uses: ./.yii2-framework-actions/actions/phpunit
+        uses: $/actions/phpunit
         with:
           configuration: ${{ inputs.phpunit-configuration }}
           coverage-driver: ${{ inputs.coverage-driver }}

@@ -45,7 +45,7 @@ on:
         required: false
         type: string
       codespell-skip:
-        description: Comma-separated list of files or globs skipped by codespell.
+        description: Additional comma-separated files or globs, appended to configuration-file exclusions.
         default: ./.git
         required: false
         type: string
@@ -207,16 +207,8 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Checkout reusable actions.
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ job.workflow_repository }}
-          ref: ${{ job.workflow_sha }}
-          path: .yii2-framework-actions
-          persist-credentials: false
-
       - name: Run actionlint.
-        uses: ./.yii2-framework-actions/actions/actionlint
+        uses: $/actions/actionlint
         with:
           config: ${{ inputs.actionlint-config }}
           flags: ${{ inputs.actionlint-flags }}
@@ -243,16 +235,8 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Checkout reusable actions.
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ job.workflow_repository }}
-          ref: ${{ job.workflow_sha }}
-          path: .yii2-framework-actions
-          persist-credentials: false
-
       - name: Run EditorConfig Checker.
-        uses: ./.yii2-framework-actions/actions/editorconfig-checker
+        uses: $/actions/editorconfig-checker
         with:
           config: ${{ inputs.editorconfig-checker-config }}
           exclude: ${{ inputs.editorconfig-checker-exclude }}
@@ -279,16 +263,8 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Checkout reusable actions.
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ job.workflow_repository }}
-          ref: ${{ job.workflow_sha }}
-          path: .yii2-framework-actions
-          persist-credentials: false
-
       - name: Run markdownlint.
-        uses: ./.yii2-framework-actions/actions/markdownlint
+        uses: $/actions/markdownlint
         with:
           config: ${{ inputs.markdownlint-config }}
           globs: ${{ inputs.markdownlint-globs }}
@@ -316,16 +292,8 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Checkout reusable actions.
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ job.workflow_repository }}
-          ref: ${{ job.workflow_sha }}
-          path: .yii2-framework-actions
-          persist-credentials: false
-
       - name: Run Prettier.
-        uses: ./.yii2-framework-actions/actions/prettier
+        uses: $/actions/prettier
         with:
           config: ${{ inputs.prettier-config }}
           ignore-path: ${{ inputs.prettier-ignore-path }}
@@ -357,16 +325,8 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Checkout reusable actions.
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ job.workflow_repository }}
-          ref: ${{ job.workflow_sha }}
-          path: .yii2-framework-actions
-          persist-credentials: false
-
       - name: Run codespell.
-        uses: ./.yii2-framework-actions/actions/codespell
+        uses: $/actions/codespell
         with:
           config: ${{ inputs.codespell-config }}
           ignore-words-file: ${{ inputs.codespell-ignore-words-file }}
@@ -395,16 +355,8 @@ jobs:
           fetch-depth: ${{ inputs.checkout_fetch_depth }}
           persist-credentials: false
 
-      - name: Checkout reusable actions.
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ job.workflow_repository }}
-          ref: ${{ job.workflow_sha }}
-          path: .yii2-framework-actions
-          persist-credentials: false
-
       - name: Run yamllint.
-        uses: ./.yii2-framework-actions/actions/yamllint
+        uses: $/actions/yamllint
         with:
           config: ${{ inputs.yamllint-config }}
           ignore: ${{ inputs.yamllint-ignore }}

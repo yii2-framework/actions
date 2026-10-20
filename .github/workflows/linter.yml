@@ -13,4 +13,4 @@ jobs:
     name: Analyze
     permissions:
       contents: read
-    uses: ./.github/workflows/quality.yml
+    uses: $/.github/workflows/quality.yml

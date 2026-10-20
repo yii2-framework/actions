@@ -43,6 +43,8 @@ runs:
         files: ${{ steps.actionlint-files.outputs.files }}
         flags: >-
           -ignore workflow_(repository|sha)
+          -ignore ^specifying\s+action\s+.\$/\S+.\s+in\s+invalid\s+format\s+because\s+ref\s+is\s+missing
+          -ignore ^reusable\s+workflow\s+call\s+.\$/\S+.\s+at\s+.uses.\s+is\s+not\s+following\s+the\s+format
           -ignore ^"(pull_request|push)"\s+section\s+is\s+alias\s+node\s+but\s+mapping\s+node\s+is\s+expected$
           ${{ inputs.config != '' && format('-config-file {0}', inputs.config) || '' }}
           ${{ inputs.flags }}

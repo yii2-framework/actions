@@ -20,7 +20,7 @@ inputs:
     default: ""
     required: false
   skip:
-    description: Comma-separated list of files or globs skipped by codespell.
+    description: Additional comma-separated files or globs, appended to configuration-file exclusions.
     default: ./.git
     required: false
 
