@@ -20,7 +20,7 @@ runs:
   using: composite
   steps:
     - name: Set up EditorConfig Checker.
-      uses: editorconfig-checker/action-editorconfig-checker@840e866d93b8e032123c23bac69dece044d4d84c # v2.2.0
+      uses: editorconfig-checker/action-editorconfig-checker@840e866d93b8e032123c23bac69dece044d4d84c
       with:
         version: ${{ inputs.version }}
 
