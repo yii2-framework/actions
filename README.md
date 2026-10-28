@@ -369,14 +369,14 @@ jobs:
       contents: read # Required to check out the repository.
       id-token: write # Required to sign published results with the GitHub OIDC token.
       security-events: write # Required to upload SARIF results to code scanning.
-    # Optional token with read access, required by the Branch-Protection check.
-    # secrets:
-    #   SCORECARD_TOKEN: ${{ secrets.SCORECARD_TOKEN }}
+    # Optional token with read access, required by the Branch-Protection check for classic branch protection.
+    secrets:
+      SCORECARD_TOKEN: ${{ secrets.SCORECARD_TOKEN }}
     # Optional configuration.
     # with:
     #   file-mode: git
     #   publish-results: true
-    #   upload-sarif: true
+    #   upload-sarif: false # Private repositories without GitHub Code Security.
 ```
 
 - Scorecard analyzes the default branch only, so trigger the workflow with `push` on that branch and `schedule`.
@@ -386,6 +386,11 @@ jobs:
 - `publish-results` sends signed results to the OpenSSF Scorecard API, which replaces the weekly public scan and
   enables the badge and the viewer for public repositories. The API verifies the called workflow, so the job keeps a
   literal `ubuntu-latest` runner and only allowlisted steps.
+- `upload-sarif` sends the SARIF results to GitHub code scanning, which private repositories only provide with GitHub
+  Code Security. Set it to `false` there, otherwise the upload fails with HTTP 403 after the Scorecard run and the
+  artifact upload complete.
+- `SCORECARD_TOKEN` is optional. An unset secret expands to an empty string and the workflow falls back to
+  `github.token`, which reads repository rulesets but not classic branch protection.
 
 ```markdown
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/{owner}/{repo}/badge)](https://scorecard.dev/viewer/?uri=github.com/{owner}/{repo})

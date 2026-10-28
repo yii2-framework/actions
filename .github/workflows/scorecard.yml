@@ -55,7 +55,7 @@ on:
         required: false
         type: boolean
       upload-sarif:
-        description: Upload SARIF results to GitHub code scanning.
+        description: Upload SARIF results to GitHub code scanning. Set to `false` for private repositories without GitHub Code Security.
         default: true
         required: false
         type: boolean
@@ -78,7 +78,7 @@ jobs:
 
     concurrency:
       cancel-in-progress: ${{ inputs.enable-concurrency }}
-      group: scorecard-${{ inputs.concurrency-group }}
+      group: ${{ inputs.enable-concurrency && format('scorecard-{0}', inputs.concurrency-group) || format('scorecard-{0}-{1}', inputs.concurrency-group, github.run_id) }}
 
     permissions:
       contents: read # Required to check out the repository.

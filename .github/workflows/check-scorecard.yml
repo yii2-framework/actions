@@ -20,3 +20,5 @@ jobs:
       id-token: write # Required to sign published results with the GitHub OIDC token.
       security-events: write # Required to upload SARIF results to code scanning.
     uses: $/.github/workflows/scorecard.yml
+    secrets:
+      SCORECARD_TOKEN: ${{ secrets.SCORECARD_TOKEN }}
