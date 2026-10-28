@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.2 Under development
 
+- ci(actions): add the reusable `testo.yml` workflow and the `testo` composite action to run Testo suites with coverage and Codecov uploads.
+
 ## v2.0.1 October 20, 2026
 
 - ci(actions): add configurable quality and security reusable workflows backed by valid composite quality actions with default noise reduction and clearer check names.

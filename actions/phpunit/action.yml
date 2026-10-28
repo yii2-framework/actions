@@ -87,8 +87,9 @@ runs:
           PHPUNIT_CMD="$PHPUNIT_CMD $DEBUG_INPUT"
         fi
 
+        # Line breaks are replaced with spaces so the command stays a single `GITHUB_OUTPUT` line.
         if [ -n "$ADDITIONAL_ARGS" ]; then
-          PHPUNIT_CMD="$PHPUNIT_CMD $ADDITIONAL_ARGS"
+          PHPUNIT_CMD="$PHPUNIT_CMD ${ADDITIONAL_ARGS//[$'\r\n']/ }"
         fi
 
         echo "command=$PHPUNIT_CMD" >> "$GITHUB_OUTPUT"
@@ -116,7 +117,12 @@ runs:
         report_type: test_results
 
     - name: Upload coverage to Codecov.
-      if: ${{ !cancelled() && inputs.coverage-driver != 'none' }}
+      if: >-
+        ${{
+        !cancelled()
+        && inputs.coverage-driver != ''
+        && inputs.coverage-driver != 'none'
+        }}
       uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
       with:
         token: ${{ inputs.coverage-token }}

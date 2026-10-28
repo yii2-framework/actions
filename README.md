@@ -28,6 +28,7 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 - [`infection.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/infection.yml) - Mutation testing with Infection.
 - [`phpunit-database.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpunit-database.yml) - PHPUnit with database services.
 - [`phpunit.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpunit.yml) - PHPUnit testing with coverage.
+- [`testo.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/testo.yml) - Testo testing with coverage.
 
 ### Quality Assurance Workflows
 
@@ -46,6 +47,7 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 - [`php-setup`](https://github.com/yii2-framework/actions/blob/main/actions/php-setup/action.yml) - PHP environment setup.
 - [`phpunit-runner`](https://github.com/yii2-framework/actions/blob/main/actions/phpunit/action.yml) - Advanced PHPUnit execution.
 - [`prettier`](https://github.com/yii2-framework/actions/blob/main/actions/prettier/action.yml) - Markdown and YAML formatting validation.
+- [`testo-runner`](https://github.com/yii2-framework/actions/blob/main/actions/testo/action.yml) - Advanced Testo execution.
 - [`yamllint`](https://github.com/yii2-framework/actions/blob/main/actions/yamllint/action.yml) - YAML validation.
 
 ## Quick start
@@ -247,6 +249,48 @@ jobs:
       # Environment
       php-version: '["8.4"]'
       tools: cs2pr
+```
+
+### Testo
+
+```yaml
+---
+on:
+  pull_request: &ignore-paths
+    paths-ignore:
+      - ".gitattributes"
+      - ".gitignore"
+      - "CHANGELOG.md"
+      - "docs/**"
+      - "README.md"
+
+  push: *ignore-paths
+
+name: build
+
+jobs:
+  testo:
+    uses: yii2-framework/actions/.github/workflows/testo.yml@v2
+    secrets:
+      AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    with:
+      # Composer settings
+      composer-command: install
+      # Coverage settings
+      coverage-driver: pcov
+      coverage-format: clover
+      # PHP configuration
+      extensions: mbstring, intl, pdo_sqlite
+      php-ini-values: date.timezone='UTC', memory_limit=-1
+      # Operating systems
+      os: '["ubuntu-latest", "windows-2022"]'
+      # PHP versions to test
+      php-version: '["8.2", "8.3", "8.4", "8.5"]'
+      # Testo configuration
+      testo-configuration: testo.php
+      testo-suite: Unit
+      testo-type: "!bench"
 ```
 
 ### Linter
