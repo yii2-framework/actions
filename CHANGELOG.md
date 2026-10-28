@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v2.0.2 Under development
 
 - ci(actions): add the reusable `testo.yml` workflow and the `testo` composite action to run Testo suites with coverage and Codecov uploads.
+- ci(actions): add the reusable `scorecard.yml` workflow to run OpenSSF Scorecard in git file mode with SARIF upload and result publishing.
 
 ## v2.0.1 October 20, 2026
 
