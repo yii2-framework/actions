@@ -81,7 +81,7 @@ on:
         type: string
       testo-additional-args:
         description: Additional Testo arguments, separated by whitespace.
-        default: "--log-junit=junit.xml"
+        default: ""
         required: false
         type: string
       testo-configuration:
@@ -102,6 +102,11 @@ on:
       testo-group:
         description: Group to run, passed with `--group`.
         default:
+        required: false
+        type: string
+      testo-junit-file:
+        description: JUnit report file, passed with `--log-junit` and uploaded to Codecov as test results; empty disables it.
+        default: junit.xml
         required: false
         type: string
       testo-path:
@@ -191,6 +196,7 @@ jobs:
           exclude-group: ${{ inputs.testo-exclude-group }}
           filter: ${{ inputs.testo-filter }}
           group: ${{ inputs.testo-group }}
+          junit-file: ${{ inputs.testo-junit-file }}
           path: ${{ inputs.testo-path }}
           suite: ${{ inputs.testo-suite }}
           type: ${{ inputs.testo-type }}

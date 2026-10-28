@@ -5,7 +5,7 @@ description: Run Testo tests with coverage and configurable options.
 inputs:
   additional-args:
     description: Additional Testo arguments, separated by whitespace.
-    default: "--log-junit=junit.xml"
+    default: ""
     required: false
   configuration:
     description: Testo configuration file, passed with `--config`.
@@ -39,6 +39,10 @@ inputs:
     description: Group to run, passed with `--group`.
     default: ""
     required: false
+  junit-file:
+    description: JUnit report file, passed with `--log-junit` and uploaded to Codecov as test results; empty disables it.
+    default: junit.xml
+    required: false
   path:
     description: Path to the Testo executable.
     default: vendor/bin/testo
@@ -67,6 +71,7 @@ runs:
         EXCLUDE_GROUP_INPUT: ${{ inputs.exclude-group }}
         FILTER_INPUT: ${{ inputs.filter }}
         GROUP_INPUT: ${{ inputs.group }}
+        JUNIT_FILE: ${{ inputs.junit-file }}
         PATH_INPUT: ${{ inputs.path }}
         SUITE_INPUT: ${{ inputs.suite }}
         TYPE_INPUT: ${{ inputs.type }}
@@ -85,6 +90,7 @@ runs:
           args+=("--coverage-$COVERAGE_FORMAT=$COVERAGE_FILE")
         fi
 
+        add_param "--log-junit" "$JUNIT_FILE"
         add_param "--config" "$CONFIG_INPUT"
         add_param "--suite" "$SUITE_INPUT"
         add_param "--filter" "$FILTER_INPUT"
@@ -123,6 +129,7 @@ runs:
         EXCLUDE_GROUP_INPUT: ${{ inputs.exclude-group }}
         FILTER_INPUT: ${{ inputs.filter }}
         GROUP_INPUT: ${{ inputs.group }}
+        JUNIT_FILE: ${{ inputs.junit-file }}
         PATH_INPUT: ${{ inputs.path }}
         SUITE_INPUT: ${{ inputs.suite }}
         TYPE_INPUT: ${{ inputs.type }}
@@ -139,6 +146,7 @@ runs:
           $testoArgs += "--coverage-$($env:COVERAGE_FORMAT)=$($env:COVERAGE_FILE)"
         }
 
+        Add-Param '--log-junit' $env:JUNIT_FILE
         Add-Param '--config' $env:CONFIG_INPUT
         Add-Param '--suite' $env:SUITE_INPUT
         Add-Param '--filter' $env:FILTER_INPUT
@@ -164,18 +172,20 @@ runs:
         }
 
     - name: Upload test results to Codecov.
-      if: ${{ !cancelled() }}
+      if: ${{ !cancelled() && inputs.junit-file != '' }}
       uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
       with:
         token: ${{ inputs.coverage-token }}
+        files: ./${{ inputs.junit-file }}
         report_type: test_results
 
     - name: Upload coverage to Codecov.
-      if: ${{
+      if: >-
+        ${{
         !cancelled()
         && inputs.coverage-driver != ''
         && inputs.coverage-driver != 'none'
-      }}
+        }}
       uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
       with:
         token: ${{ inputs.coverage-token }}
