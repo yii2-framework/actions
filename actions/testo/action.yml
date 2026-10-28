@@ -103,8 +103,9 @@ runs:
         add_param "--type" "$TYPE_INPUT"
 
         # Additional arguments are whitespace-separated; each word is passed as one argument.
+        # Line breaks are replaced with spaces so multi-line values split like the Windows step.
         if [ -n "$ADDITIONAL_ARGS" ]; then
-          read -r -a extra <<< "$ADDITIONAL_ARGS"
+          read -r -a extra <<< "${ADDITIONAL_ARGS//[$'\r\n']/ }"
 
           if [ "${#extra[@]}" -gt 0 ]; then
             args+=("${extra[@]}")

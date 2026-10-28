@@ -87,8 +87,9 @@ runs:
           PHPUNIT_CMD="$PHPUNIT_CMD $DEBUG_INPUT"
         fi
 
+        # Line breaks are replaced with spaces so the command stays a single `GITHUB_OUTPUT` line.
         if [ -n "$ADDITIONAL_ARGS" ]; then
-          PHPUNIT_CMD="$PHPUNIT_CMD $ADDITIONAL_ARGS"
+          PHPUNIT_CMD="$PHPUNIT_CMD ${ADDITIONAL_ARGS//[$'\r\n']/ }"
         fi
 
         echo "command=$PHPUNIT_CMD" >> "$GITHUB_OUTPUT"
