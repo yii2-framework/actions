@@ -1,0 +1,178 @@
+---
+name: Testo Test Runner.
+description: Run Testo tests with coverage and configurable options.
+
+inputs:
+  additional-args:
+    description: Additional Testo arguments, separated by whitespace.
+    default: "--log-junit=junit.xml"
+    required: false
+  configuration:
+    description: Testo configuration file, passed with `--config`.
+    default: ""
+    required: false
+  coverage-driver:
+    description: Code coverage driver to use (pcov, xdebug, none).
+    default: ""
+    required: false
+  coverage-file:
+    description: Coverage output file name.
+    default: coverage.xml
+    required: false
+  coverage-format:
+    description: Coverage report format (clover, cobertura).
+    default: clover
+    required: false
+  coverage-token:
+    description: Codecov token for uploading coverage.
+    default: ""
+    required: false
+  exclude-group:
+    description: Group to exclude, passed as `--group=!<name>`.
+    default: ""
+    required: false
+  filter:
+    description: "Test filter: a class, `Class::method`, FQN or name fragment, passed with `--filter`."
+    default: ""
+    required: false
+  group:
+    description: Group to run, passed with `--group`.
+    default: ""
+    required: false
+  path:
+    description: Path to the Testo executable.
+    default: vendor/bin/testo
+    required: false
+  suite:
+    description: Suite to run, passed with `--suite`.
+    default: ""
+    required: false
+  type:
+    description: Test type filter passed with `--type`; `!bench` skips benchmarks.
+    default: "!bench"
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Run Testo tests on Linux.
+      shell: bash
+      if: runner.os != 'Windows'
+      env:
+        ADDITIONAL_ARGS: ${{ inputs.additional-args }}
+        CONFIG_INPUT: ${{ inputs.configuration }}
+        COVERAGE_DRIVER: ${{ inputs.coverage-driver }}
+        COVERAGE_FILE: ${{ inputs.coverage-file }}
+        COVERAGE_FORMAT: ${{ inputs.coverage-format }}
+        EXCLUDE_GROUP_INPUT: ${{ inputs.exclude-group }}
+        FILTER_INPUT: ${{ inputs.filter }}
+        GROUP_INPUT: ${{ inputs.group }}
+        PATH_INPUT: ${{ inputs.path }}
+        SUITE_INPUT: ${{ inputs.suite }}
+        TYPE_INPUT: ${{ inputs.type }}
+      run: |
+        set -euo pipefail
+
+        args=(--ansi)
+
+        add_param() {
+          if [ -n "$2" ]; then
+            args+=("$1=$2")
+          fi
+        }
+
+        if [ -n "$COVERAGE_DRIVER" ] && [ "$COVERAGE_DRIVER" != "none" ]; then
+          args+=("--coverage-$COVERAGE_FORMAT=$COVERAGE_FILE")
+        fi
+
+        add_param "--config" "$CONFIG_INPUT"
+        add_param "--suite" "$SUITE_INPUT"
+        add_param "--filter" "$FILTER_INPUT"
+        add_param "--group" "$GROUP_INPUT"
+
+        if [ -n "$EXCLUDE_GROUP_INPUT" ]; then
+          add_param "--group" "!$EXCLUDE_GROUP_INPUT"
+        fi
+
+        add_param "--type" "$TYPE_INPUT"
+
+        # Additional arguments are whitespace-separated; each word is passed as one argument.
+        if [ -n "$ADDITIONAL_ARGS" ]; then
+          read -r -a extra <<< "$ADDITIONAL_ARGS"
+
+          if [ "${#extra[@]}" -gt 0 ]; then
+            args+=("${extra[@]}")
+          fi
+        fi
+
+        printf 'Testo command:'
+        printf ' %q' "$PATH_INPUT" "${args[@]}"
+        printf '\n'
+
+        "$PATH_INPUT" "${args[@]}"
+
+    - name: Run Testo tests on Windows.
+      shell: pwsh
+      if: runner.os == 'Windows'
+      env:
+        ADDITIONAL_ARGS: ${{ inputs.additional-args }}
+        CONFIG_INPUT: ${{ inputs.configuration }}
+        COVERAGE_DRIVER: ${{ inputs.coverage-driver }}
+        COVERAGE_FILE: ${{ inputs.coverage-file }}
+        COVERAGE_FORMAT: ${{ inputs.coverage-format }}
+        EXCLUDE_GROUP_INPUT: ${{ inputs.exclude-group }}
+        FILTER_INPUT: ${{ inputs.filter }}
+        GROUP_INPUT: ${{ inputs.group }}
+        PATH_INPUT: ${{ inputs.path }}
+        SUITE_INPUT: ${{ inputs.suite }}
+        TYPE_INPUT: ${{ inputs.type }}
+      run: |
+        $testoArgs = @('--ansi')
+
+        function Add-Param([string] $Name, [string] $Value) {
+          if (-not [string]::IsNullOrEmpty($Value)) {
+            $script:testoArgs += "$Name=$Value"
+          }
+        }
+
+        if (-not [string]::IsNullOrEmpty($env:COVERAGE_DRIVER) -and $env:COVERAGE_DRIVER -ne 'none') {
+          $testoArgs += "--coverage-$($env:COVERAGE_FORMAT)=$($env:COVERAGE_FILE)"
+        }
+
+        Add-Param '--config' $env:CONFIG_INPUT
+        Add-Param '--suite' $env:SUITE_INPUT
+        Add-Param '--filter' $env:FILTER_INPUT
+        Add-Param '--group' $env:GROUP_INPUT
+
+        if (-not [string]::IsNullOrEmpty($env:EXCLUDE_GROUP_INPUT)) {
+          Add-Param '--group' "!$($env:EXCLUDE_GROUP_INPUT)"
+        }
+
+        Add-Param '--type' $env:TYPE_INPUT
+
+        # Additional arguments are whitespace-separated; each word is passed as one argument.
+        if (-not [string]::IsNullOrWhiteSpace($env:ADDITIONAL_ARGS)) {
+          $testoArgs += $env:ADDITIONAL_ARGS.Trim() -split '\s+'
+        }
+
+        Write-Output "Testo command: $($env:PATH_INPUT) $($testoArgs -join ' ')"
+
+        & $env:PATH_INPUT @testoArgs
+
+        if ($LASTEXITCODE -ne 0) {
+          exit $LASTEXITCODE
+        }
+
+    - name: Upload test results to Codecov.
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
+      with:
+        token: ${{ inputs.coverage-token }}
+        report_type: test_results
+
+    - name: Upload coverage to Codecov.
+      if: ${{ !cancelled() && inputs.coverage-driver != 'none' }}
+      uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
+      with:
+        token: ${{ inputs.coverage-token }}
+        files: ./${{ inputs.coverage-file }}

@@ -1,0 +1,196 @@
+---
+name: testo
+
+on:
+  workflow_call:
+    inputs:
+      composer-command:
+        description: Composer command (install or update) to run.
+        default: update
+        required: false
+        type: string
+      composer-flags:
+        description: Additional composer flags
+        default: >-
+          --prefer-dist
+          --no-interaction
+          --no-progress
+          --optimize-autoloader
+          --ansi
+        required: false
+        type: string
+      composer-version:
+        description: Composer version to use.
+        default:
+        required: false
+        type: string
+      concurrency-group:
+        description: Concurrency group name.
+        default: ${{ github.workflow }}-${{ github.ref }}
+        required: false
+        type: string
+      coverage-driver:
+        description: Code coverage driver to use (pcov, xdebug).
+        default: pcov
+        required: false
+        type: string
+      coverage-file:
+        description: Coverage output file name.
+        default: coverage.xml
+        required: false
+        type: string
+      coverage-format:
+        description: Coverage report format (clover, cobertura).
+        default: clover
+        required: false
+        type: string
+      enable-concurrency:
+        description: Enable concurrency.
+        default: true
+        required: false
+        type: boolean
+      extensions:
+        description: List of extensions to PHP.
+        default:
+        required: false
+        type: string
+      hook:
+        description: Hook to run.
+        default:
+        required: false
+        type: string
+      ignore-platform-reqs:
+        description: Whether to add --ignore-platform-reqs to composer command.
+        default: false
+        required: false
+        type: boolean
+      os:
+        description: OS runner as a JSON array string '["ubuntu-latest"]'.
+        default: '["ubuntu-latest","windows-2022"]'
+        required: false
+        type: string
+      php-ini-values:
+        description: Initial values for PHP configuration.
+        default: date.timezone='UTC'
+        required: false
+        type: string
+      php-version:
+        description: PHP versions as a JSON array string '["8.5"]'.
+        default: '["8.2","8.3","8.4","8.5"]'
+        required: false
+        type: string
+      testo-additional-args:
+        description: Additional Testo arguments, separated by whitespace.
+        default: "--log-junit=junit.xml"
+        required: false
+        type: string
+      testo-configuration:
+        description: Testo configuration file, passed with `--config`.
+        default: ""
+        required: false
+        type: string
+      testo-exclude-group:
+        description: Group to exclude, passed as `--group=!<name>`.
+        default:
+        required: false
+        type: string
+      testo-filter:
+        description: "Test filter: a class, `Class::method`, FQN or name fragment, passed with `--filter`."
+        default: ""
+        required: false
+        type: string
+      testo-group:
+        description: Group to run, passed with `--group`.
+        default:
+        required: false
+        type: string
+      testo-path:
+        description: Path to the Testo executable.
+        default: vendor/bin/testo
+        required: false
+        type: string
+      testo-suite:
+        description: Suite to run, passed with `--suite`.
+        default: ""
+        required: false
+        type: string
+      testo-type:
+        description: Test type filter passed with `--type`; `!bench` skips benchmarks.
+        default: "!bench"
+        required: false
+        type: string
+      tools:
+        description: Tools to test, separated by comma.
+        default:
+        required: false
+        type: string
+
+    secrets:
+      AUTH_TOKEN:
+        description: GitHub token.
+        required: false
+      CODECOV_TOKEN:
+        description: Codecov token.
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  testo:
+    name: PHP ${{ matrix.php-version }}-${{ matrix.os }}
+
+    concurrency:
+      group: ${{ inputs.enable-concurrency && format('{0}-{1}-{2}', matrix.os, matrix.php-version, inputs.concurrency-group) || format('{0}-{1}-{2}-{3}', matrix.os, matrix.php-version, inputs.concurrency-group, github.run_id) }}
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+        php-version: ${{ fromJson(inputs.php-version) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP Environment.
+        uses: $/actions/php-setup
+        with:
+          auth-token: ${{ secrets.AUTH_TOKEN }}
+          composer-command: ${{ inputs.composer-command }}
+          composer-flags: ${{ inputs.composer-flags }}
+          composer-version: ${{ inputs.composer-version }}
+          coverage-driver: ${{ inputs.coverage-driver }}
+          extensions: ${{ inputs.extensions }}
+          ignore-platform-reqs: ${{ inputs.ignore-platform-reqs }}
+          ini-values: ${{ inputs.php-ini-values }}
+          php-version: ${{ matrix.php-version }}
+          tools: ${{ inputs.tools }}
+
+      - name: Run hook.
+        if: inputs.hook != ''
+        shell: bash
+        env:
+          HOOK: ${{ inputs.hook }}
+        run: bash -euo pipefail -c "$HOOK"
+
+      - name: Run Testo tests with coverage.
+        uses: $/actions/testo
+        with:
+          additional-args: ${{ inputs.testo-additional-args }}
+          configuration: ${{ inputs.testo-configuration }}
+          coverage-driver: ${{ inputs.coverage-driver }}
+          coverage-file: ${{ inputs.coverage-file }}
+          coverage-format: ${{ inputs.coverage-format }}
+          coverage-token: ${{ secrets.CODECOV_TOKEN }}
+          exclude-group: ${{ inputs.testo-exclude-group }}
+          filter: ${{ inputs.testo-filter }}
+          group: ${{ inputs.testo-group }}
+          path: ${{ inputs.testo-path }}
+          suite: ${{ inputs.testo-suite }}
+          type: ${{ inputs.testo-type }}
