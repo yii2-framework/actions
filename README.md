@@ -36,6 +36,7 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 - [`ecs.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/ecs.yml) - Easy Coding Standard.
 - [`phpstan.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpstan.yml) - Static analysis.
 - [`quality.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/quality.yml) - Reusable quality checks.
+- [`scorecard.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/scorecard.yml) - OpenSSF Scorecard supply-chain security analysis.
 - [`security.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/security.yml) - Security checks for GitHub Actions and secrets.
 
 ### Utility Actions
@@ -344,6 +345,52 @@ jobs:
     #   zizmor-config: .github/linters/zizmor.yml
 ```
 
+### OpenSSF Scorecard
+
+```yaml
+---
+on:
+  branch_protection_rule:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "30 1 * * 6"
+
+name: scorecard
+
+permissions:
+  contents: read
+
+jobs:
+  scorecard:
+    uses: yii2-framework/actions/.github/workflows/scorecard.yml@main
+    permissions:
+      contents: read # Required to check out the repository.
+      id-token: write # Required to sign published results with the GitHub OIDC token.
+      security-events: write # Required to upload SARIF results to code scanning.
+    # Optional token with read access, required by the Branch-Protection check.
+    # secrets:
+    #   SCORECARD_TOKEN: ${{ secrets.SCORECARD_TOKEN }}
+    # Optional configuration.
+    # with:
+    #   file-mode: git
+    #   publish-results: true
+    #   upload-sarif: true
+```
+
+- Scorecard analyzes the default branch only, so trigger the workflow with `push` on that branch and `schedule`.
+- `file-mode` defaults to `git`, so Scorecard also analyzes paths such as `.github` that `.gitattributes` marks with
+  `export-ignore`. The default `archive` mode of the action reads the GitHub tarball and skips those paths, which
+  hides workflows, the security policy and token permissions from the checks.
+- `publish-results` sends signed results to the OpenSSF Scorecard API, which replaces the weekly public scan and
+  enables the badge and the viewer for public repositories. The API verifies the called workflow, so the job keeps a
+  literal `ubuntu-latest` runner and only allowlisted steps.
+
+```markdown
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/{owner}/{repo}/badge)](https://scorecard.dev/viewer/?uri=github.com/{owner}/{repo})
+```
+
 > **Note**: YAML files should use 2-space indentation. This example shows correct YAML syntax - copy it to your `.github/workflows/*.yml` files as-is.
 
 ## Package information
@@ -353,6 +400,7 @@ jobs:
 ## Quality code
 
 [![Quality](https://img.shields.io/github/actions/workflow/status/yii2-framework/actions/linter.yml?style=for-the-badge&label=Quality&logo=github)](https://github.com/yii2-framework/actions/actions/workflows/linter.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/yii2-framework/actions/badge?style=for-the-badge)](https://scorecard.dev/viewer/?uri=github.com/yii2-framework/actions)
 
 ## Our social networks
 
