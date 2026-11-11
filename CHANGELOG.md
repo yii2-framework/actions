@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.0.2 Under development
+## v2.0.2 November 11, 2026
 
 - ci(actions): add the reusable `testo.yml` workflow and the `testo` composite action to run Testo suites with coverage and Codecov uploads.
 - ci(actions): add the reusable `scorecard.yml` workflow to run OpenSSF Scorecard in git file mode with SARIF upload and result publishing.
