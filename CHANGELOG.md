@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.0.3 Under development
+## v2.0.3 November 19, 2026
 
 - ci(workflows): update PHP version descriptions and defaults to include `8.6`.
 - chore: update .gitattributes and .gitignore for improved file handling and exclusions.
