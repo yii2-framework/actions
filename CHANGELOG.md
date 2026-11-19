@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.3 Under development
 
+- ci(workflows): update PHP version descriptions and defaults to include `8.6`.
+
 ## v2.0.2 November 11, 2026
 
 - ci(actions): add the reusable `testo.yml` workflow and the `testo` composite action to run Testo suites with coverage and Codecov uploads.
