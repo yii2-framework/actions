@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v2.0.3 Under development
 
 - ci(workflows): update PHP version descriptions and defaults to include `8.6`.
+- chore: update .gitattributes and .gitignore for improved file handling and exclusions.
 
 ## v2.0.2 November 11, 2026
 
