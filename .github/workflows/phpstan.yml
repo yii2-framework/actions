@@ -71,7 +71,7 @@ on:
         type: string
       php-version:
         description: PHP versions as a JSON array string '[8.6]'.
-        default: '[8.6]'
+        default: "[8.6]"
         required: false
         type: string
       tools:
