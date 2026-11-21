@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.6 Under development
+
 ## v2.0.5 November 21, 2026
 
 - ci(actions): add the reusable `assets.yml` and `playwright.yml` workflows and the `node-setup` and `playwright` composite actions.
