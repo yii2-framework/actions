@@ -1,6 +1,6 @@
 ---
 name: Playwright browsers.
-description: Install Playwright browsers with the Playwright version installed in the project dependencies.
+description: Install Playwright browsers with the Playwright bin that the project dependencies installed in node_modules/.bin.
 
 inputs:
   browsers:
@@ -28,12 +28,17 @@ runs:
       run: |
         set -euo pipefail
 
-        # `--no` makes npx use the Playwright version installed in the project and never download another one.
-        if ! version="$(npx --no -- playwright --version)"; then
-          echo "::error title=Playwright not installed::Add playwright or @playwright/test to the project dependencies and install them before this action."
+        # Only the `playwright` bin that the project install linked into `node_modules/.bin` of the working directory is
+        # used, never npx, the npm cache or PATH. npm links it on Linux and macOS and writes a shell shim next to the
+        # `.cmd` and `.ps1` shims on Windows, so the same path exists and runs from bash on every runner.
+        playwright="./node_modules/.bin/playwright"
+
+        if [ ! -f "$playwright" ]; then
+          echo "::error title=Playwright not installed::$playwright was not found; add playwright or @playwright/test to the project dependencies and install them before this action."
           exit 1
         fi
 
+        version="$("$playwright" --version)"
         echo "Using Playwright: $version"
 
         args=(install)
@@ -56,7 +61,7 @@ runs:
         fi
 
         printf 'Playwright command:'
-        printf ' %q' npx --no -- playwright "${args[@]}"
+        printf ' %q' "$playwright" "${args[@]}"
         printf '\n'
 
-        npx --no -- playwright "${args[@]}"
+        "$playwright" "${args[@]}"

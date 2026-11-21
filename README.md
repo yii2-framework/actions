@@ -107,7 +107,10 @@ jobs:
   read only when `node-version` is empty, and the job fails when that file does not exist. With both empty, the Node.js
   version preinstalled on the runner is used.
 - `cache` (default `npm`) restores the package manager cache keyed on the lock file, so it requires a committed lock
-  file. Set it to an empty string to disable the cache.
+  file. `npm` is the only supported value, because setup-node asks the package manager itself for its cache directory
+  and these workflows install nothing before it. Set it to an empty string to disable the cache; with `cache: ""`
+  setup-node runs no package manager, so a project that uses another package manager can pass its own
+  `install-command`, provided that the command makes that package manager available first.
 - PHP is set up only when `php-version` is given: the job then installs that single PHP version without a coverage
   driver and runs `composer <composer-command> <composer-flags>` before Node.js. With the default empty value, PHP and
   Composer are skipped entirely.
@@ -352,10 +355,10 @@ jobs:
         runtime/playwright/
 ```
 
-- Browsers are installed with the Playwright version from the project dependencies (`playwright` or
-  `@playwright/test`), which must already be installed by `install-command`; the job fails when Playwright is missing
-  instead of downloading another version. `only-shell: true` adds `--only-shell` and `with-deps: false` drops
-  `--with-deps`.
+- Browsers are installed by running `node_modules/.bin/playwright install` from the working directory, the bin that
+  `install-command` linked for the project dependency `playwright` or `@playwright/test`. The job fails when that file
+  does not exist; it never falls back to npx, the npm cache or a `playwright` executable on `PATH`. `only-shell: true`
+  adds `--only-shell` and `with-deps: false` drops `--with-deps`.
 - `commands` (default `npx playwright test`), `node-version`, `node-version-file`, `cache` and the PHP inputs behave as
   in [Assets](#assets): the lines run in order and the job stops at the first one that fails, and PHP is set up only
   when `php-version` is given. A line can set environment variables inline, for example

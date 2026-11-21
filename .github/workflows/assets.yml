@@ -5,7 +5,7 @@ on:
   workflow_call:
     inputs:
       cache:
-        description: Package manager whose cache setup-node restores and saves (npm, yarn, pnpm); empty disables the package cache.
+        description: Package manager cache that setup-node restores and saves; `npm` is the supported value and empty disables the package cache.
         default: npm
         required: false
         type: string
