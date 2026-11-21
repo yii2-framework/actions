@@ -1,0 +1,190 @@
+---
+name: playwright
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Name of the uploaded artifact, suffixed with the runner OS.
+        default: playwright-report
+        required: false
+        type: string
+      artifact-path:
+        description: Newline-separated paths (reports, traces, screenshots) uploaded as an artifact when the job fails; empty disables the upload.
+        default: ""
+        required: false
+        type: string
+      browsers:
+        description: Playwright browsers to install, separated by whitespace; empty installs the Playwright default browsers.
+        default: chromium
+        required: false
+        type: string
+      cache:
+        description: Package manager cache that setup-node restores and saves; `npm` is the supported value and empty disables the package cache.
+        default: npm
+        required: false
+        type: string
+      commands:
+        description: Commands to run in order, one per line; the job stops at the first command that fails.
+        default: npx playwright test
+        required: false
+        type: string
+      composer-command:
+        description: Composer command (install or update) to run.
+        default: update
+        required: false
+        type: string
+      composer-flags:
+        description: Additional composer flags
+        default: >-
+          --prefer-dist
+          --no-interaction
+          --no-progress
+          --optimize-autoloader
+          --ansi
+        required: false
+        type: string
+      concurrency-group:
+        description: Concurrency group name.
+        default: ${{ github.workflow }}-${{ github.ref }}
+        required: false
+        type: string
+      enable-concurrency:
+        description: Enable concurrency.
+        default: true
+        required: false
+        type: boolean
+      extensions:
+        description: List of extensions to PHP.
+        default: ""
+        required: false
+        type: string
+      install-command:
+        description: Command that installs the project dependencies; empty skips installation.
+        default: npm ci
+        required: false
+        type: string
+      node-version:
+        description: Node.js version to use (for example, "24"); takes precedence over `node-version-file`.
+        default: ""
+        required: false
+        type: string
+      node-version-file:
+        description: File that declares the Node.js version, used only when `node-version` is empty.
+        default: .nvmrc
+        required: false
+        type: string
+      only-shell:
+        description: Whether to add --only-shell to install only the headless shell of Chromium.
+        default: false
+        required: false
+        type: boolean
+      os:
+        description: OS runner as a JSON array string '["ubuntu-latest"]'.
+        default: '["ubuntu-latest"]'
+        required: false
+        type: string
+      php-version:
+        description: PHP version to install with Composer dependencies before Node.js (for example, "8.3"); empty skips PHP.
+        default: ""
+        required: false
+        type: string
+      with-deps:
+        description: Whether to add --with-deps to install the operating system dependencies of the browsers.
+        default: true
+        required: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    name: Playwright ${{ matrix.os }}
+
+    concurrency:
+      group: ${{ inputs.enable-concurrency && format('playwright-{0}-{1}', matrix.os, inputs.concurrency-group) || format('playwright-{0}-{1}-{2}', matrix.os, inputs.concurrency-group, github.run_id) }}
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP Environment.
+        if: inputs.php-version != ''
+        uses: $/actions/php-setup
+        with:
+          composer-command: ${{ inputs.composer-command }}
+          composer-flags: ${{ inputs.composer-flags }}
+          coverage-driver: none
+          extensions: ${{ inputs.extensions }}
+          php-version: ${{ inputs.php-version }}
+
+      - name: Setup Node.js Environment.
+        uses: $/actions/node-setup
+        with:
+          cache: ${{ inputs.cache }}
+          install-command: ${{ inputs.install-command }}
+          node-version: ${{ inputs.node-version }}
+          node-version-file: ${{ inputs.node-version-file }}
+
+      - name: Install Playwright browsers.
+        uses: $/actions/playwright
+        with:
+          browsers: ${{ inputs.browsers }}
+          only-shell: ${{ inputs.only-shell }}
+          with-deps: ${{ inputs.with-deps }}
+
+      - name: Run commands.
+        if: inputs.commands != ''
+        shell: bash
+        env:
+          COMMANDS: ${{ inputs.commands }}
+        run: |
+          set -euo pipefail
+
+          commands=()
+
+          while IFS= read -r command; do
+            if [[ "$command" =~ [^[:space:]] ]]; then
+              commands+=("$command")
+            fi
+          done <<< "$COMMANDS"
+
+          if [ "${#commands[@]}" -eq 0 ]; then
+            echo "No commands configured; skipping."
+            exit 0
+          fi
+
+          # Each line runs in its own shell and log group; the first failing line stops the step.
+          # Workflow command messages encode `%` as `%25`.
+          for command in "${commands[@]}"; do
+            title="${command//\%/%25}"
+            status=0
+
+            echo "::group::$title"
+            bash -euo pipefail -c "$command" || status=$?
+            echo "::endgroup::"
+
+            if [ "$status" -ne 0 ]; then
+              echo "::error title=Command failed::$title (exit code $status)"
+              exit "$status"
+            fi
+          done
+
+      - name: Upload Playwright artifacts.
+        if: ${{ failure() && inputs.artifact-path != '' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          if-no-files-found: warn
+          name: ${{ format('{0}-{1}', inputs.artifact-name, matrix.os) }}
+          path: ${{ inputs.artifact-path }}

@@ -24,10 +24,12 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 
 ### Testing Workflows
 
+- [`assets.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/assets.yml) - Front-end asset commands with generated file drift detection.
 - [`codeception.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/codeception.yml) - Codeception testing framework.
 - [`infection.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/infection.yml) - Mutation testing with Infection.
 - [`phpunit-database.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpunit-database.yml) - PHPUnit with database services.
 - [`phpunit.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpunit.yml) - PHPUnit testing with coverage.
+- [`playwright.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/playwright.yml) - Playwright browser testing.
 - [`testo.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/testo.yml) - Testo testing with coverage.
 
 ### Quality Assurance Workflows
@@ -45,13 +47,73 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 - [`codespell`](https://github.com/yii2-framework/actions/blob/main/actions/codespell/action.yml) - Spelling validation.
 - [`editorconfig-checker`](https://github.com/yii2-framework/actions/blob/main/actions/editorconfig-checker/action.yml) - EditorConfig validation.
 - [`markdownlint`](https://github.com/yii2-framework/actions/blob/main/actions/markdownlint/action.yml) - Markdown validation.
+- [`node-setup`](https://github.com/yii2-framework/actions/blob/main/actions/node-setup/action.yml) - Node.js environment setup.
 - [`php-setup`](https://github.com/yii2-framework/actions/blob/main/actions/php-setup/action.yml) - PHP environment setup.
 - [`phpunit-runner`](https://github.com/yii2-framework/actions/blob/main/actions/phpunit/action.yml) - Advanced PHPUnit execution.
+- [`playwright`](https://github.com/yii2-framework/actions/blob/main/actions/playwright/action.yml) - Playwright browser installation.
 - [`prettier`](https://github.com/yii2-framework/actions/blob/main/actions/prettier/action.yml) - Markdown and YAML formatting validation.
 - [`testo-runner`](https://github.com/yii2-framework/actions/blob/main/actions/testo/action.yml) - Advanced Testo execution.
 - [`yamllint`](https://github.com/yii2-framework/actions/blob/main/actions/yamllint/action.yml) - YAML validation.
 
 ## Quick start
+
+### Assets
+
+```yaml
+---
+on:
+  pull_request: &ignore-paths
+    paths-ignore:
+      - ".gitattributes"
+      - ".gitignore"
+      - "CHANGELOG.md"
+      - "docs/**"
+      - "README.md"
+
+  push: *ignore-paths
+
+name: assets
+
+permissions:
+  contents: read
+
+jobs:
+  assets:
+    uses: yii2-framework/actions/.github/workflows/assets.yml@v2
+    with:
+      # Node.js settings
+      node-version-file: .nvmrc
+      install-command: npm ci
+      # Commands, run in order
+      commands: |
+        npm run test:js
+        npm run test:mutation
+        npm run build
+      # Committed generated files that the build must reproduce
+      drift-paths: |
+        src/asset/**/*.min.css
+        src/asset/**/*.min.js
+      # Optional PHP and Composer dependencies, for JavaScript tests that read files from vendor/.
+      # php-version: "8.3"
+```
+
+- `commands` runs each non-empty line in its own `bash -euo pipefail` shell and log group, in order. The job stops at
+  the first line that fails, and the remaining lines do not run.
+- `drift-paths` lists Git pathspecs, passed verbatim to `git status --porcelain --untracked-files=all` after the
+  commands. The job fails and lists the files when a tracked file under those paths was modified or deleted, or an
+  untracked file appeared, which means that a fresh build does not reproduce the committed generated files.
+  `drift-include-ignored: true` adds `--ignored=matching`, so ignored files under those paths count as drift too.
+- `node-version` selects the Node.js version directly and takes precedence. `node-version-file` (default `.nvmrc`) is
+  read only when `node-version` is empty, and the job fails when that file does not exist. With both empty, the Node.js
+  version preinstalled on the runner is used.
+- `cache` (default `npm`) restores the package manager cache keyed on the lock file, so it requires a committed lock
+  file. `npm` is the only supported value, because setup-node asks the package manager itself for its cache directory
+  and these workflows install nothing before it. Set it to an empty string to disable the cache; with `cache: ""`
+  setup-node runs no package manager, so a project that uses another package manager can pass its own
+  `install-command`, provided that the command makes that package manager available first.
+- PHP is set up only when `php-version` is given: the job then installs that single PHP version without a coverage
+  driver and runs `composer <composer-command> <composer-flags>` before Node.js. With the default empty value, PHP and
+  Composer are skipped entirely.
 
 ### Composer Require Checker
 
@@ -250,6 +312,100 @@ jobs:
       # Environment
       php-version: '["8.4"]'
       tools: cs2pr
+```
+
+### Playwright
+
+```yaml
+---
+on:
+  pull_request: &ignore-paths
+    paths-ignore:
+      - ".gitattributes"
+      - ".gitignore"
+      - "CHANGELOG.md"
+      - "docs/**"
+      - "README.md"
+
+  push: *ignore-paths
+
+name: browser
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    uses: yii2-framework/actions/.github/workflows/playwright.yml@v2
+    with:
+      # PHP serves the browser fixtures (the Playwright configuration starts `php -S`).
+      php-version: "8.3"
+      # Node.js settings
+      node-version-file: .nvmrc
+      install-command: npm ci --ignore-scripts
+      # Playwright browsers
+      browsers: chromium
+      # Commands, run in order
+      commands: |
+        npm run build
+        npm run test:browser
+      # Reports and traces, uploaded only when the job fails
+      artifact-name: playwright-report
+      artifact-path: |
+        runtime/playwright/
+```
+
+- Browsers are installed by running `node_modules/.bin/playwright install` from the working directory, the bin that
+  `install-command` linked for the project dependency `playwright` or `@playwright/test`. The job fails when that file
+  does not exist; it never falls back to npx, the npm cache or a `playwright` executable on `PATH`. `only-shell: true`
+  adds `--only-shell` and `with-deps: false` drops `--with-deps`.
+- `commands` (default `npx playwright test`), `node-version`, `node-version-file`, `cache` and the PHP inputs behave as
+  in [Assets](#assets): the lines run in order and the job stops at the first one that fails, and PHP is set up only
+  when `php-version` is given. A line can set environment variables inline, for example
+  `TIME_PICKER_BROWSERS="chromium firefox webkit" npm test`.
+- `artifact-path` is uploaded only when the job fails, as `<artifact-name>-<os>`. Paths that do not exist produce a
+  warning, not a failure.
+- A caller may put its own `strategy.matrix` on the job that calls `assets.yml` or `playwright.yml`. It must then pass
+  a `concurrency-group` and, for `playwright.yml`, an `artifact-name` that include the matrix values; otherwise all
+  cells share one concurrency group and cancel each other, and their artifacts collide.
+
+```yaml
+jobs:
+  consumer:
+    strategy:
+      fail-fast: false
+      matrix:
+        dependencies: [highest, lowest]
+    uses: yii2-framework/actions/.github/workflows/playwright.yml@v2
+    with:
+      artifact-name: consumer-${{ matrix.dependencies }}
+      concurrency-group: consumer-${{ matrix.dependencies }}-${{ github.workflow }}-${{ github.ref }}
+      commands: |
+        TIME_PICKER_DEPENDENCIES=${{ matrix.dependencies }} bash scripts/verify-consumer.sh "2.0.55"
+      php-version: "8.3"
+```
+
+- Jobs that need a different shape can use the two composite actions directly. `node-setup` does not check out the
+  repository, and `playwright` expects the dependencies to be installed.
+
+```yaml
+steps:
+  - name: Checkout repository.
+    uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    with:
+      persist-credentials: false
+
+  - name: Setup Node.js Environment.
+    uses: yii2-framework/actions/actions/node-setup@v2
+    with:
+      install-command: npm ci --ignore-scripts
+      node-version: "26"
+
+  - name: Install Playwright browsers.
+    uses: yii2-framework/actions/actions/playwright@v2
+    with:
+      browsers: chromium firefox webkit
+      only-shell: true
 ```
 
 ### Testo

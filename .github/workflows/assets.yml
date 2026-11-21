@@ -1,0 +1,201 @@
+---
+name: assets
+
+on:
+  workflow_call:
+    inputs:
+      cache:
+        description: Package manager cache that setup-node restores and saves; `npm` is the supported value and empty disables the package cache.
+        default: npm
+        required: false
+        type: string
+      commands:
+        description: Commands to run in order, one per line; the job stops at the first command that fails.
+        default: ""
+        required: false
+        type: string
+      composer-command:
+        description: Composer command (install or update) to run.
+        default: update
+        required: false
+        type: string
+      composer-flags:
+        description: Additional composer flags
+        default: >-
+          --prefer-dist
+          --no-interaction
+          --no-progress
+          --optimize-autoloader
+          --ansi
+        required: false
+        type: string
+      concurrency-group:
+        description: Concurrency group name.
+        default: ${{ github.workflow }}-${{ github.ref }}
+        required: false
+        type: string
+      drift-include-ignored:
+        description: Whether to also report ignored files that match `drift-paths`, adding --ignored=matching to git status.
+        default: false
+        required: false
+        type: boolean
+      drift-paths:
+        description: Newline-separated Git pathspecs that must have no changes and no untracked files after the commands; empty disables the check.
+        default: ""
+        required: false
+        type: string
+      enable-concurrency:
+        description: Enable concurrency.
+        default: true
+        required: false
+        type: boolean
+      extensions:
+        description: List of extensions to PHP.
+        default: ""
+        required: false
+        type: string
+      install-command:
+        description: Command that installs the project dependencies; empty skips installation.
+        default: npm ci
+        required: false
+        type: string
+      node-version:
+        description: Node.js version to use (for example, "24"); takes precedence over `node-version-file`.
+        default: ""
+        required: false
+        type: string
+      node-version-file:
+        description: File that declares the Node.js version, used only when `node-version` is empty.
+        default: .nvmrc
+        required: false
+        type: string
+      os:
+        description: OS runner as a JSON array string '["ubuntu-latest"]'.
+        default: '["ubuntu-latest"]'
+        required: false
+        type: string
+      php-version:
+        description: PHP version to install with Composer dependencies before Node.js (for example, "8.3"); empty skips PHP.
+        default: ""
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  assets:
+    name: Assets ${{ matrix.os }}
+
+    concurrency:
+      group: ${{ inputs.enable-concurrency && format('assets-{0}-{1}', matrix.os, inputs.concurrency-group) || format('assets-{0}-{1}-{2}', matrix.os, inputs.concurrency-group, github.run_id) }}
+      cancel-in-progress: ${{ inputs.enable-concurrency }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(inputs.os) }}
+
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP Environment.
+        if: inputs.php-version != ''
+        uses: $/actions/php-setup
+        with:
+          composer-command: ${{ inputs.composer-command }}
+          composer-flags: ${{ inputs.composer-flags }}
+          coverage-driver: none
+          extensions: ${{ inputs.extensions }}
+          php-version: ${{ inputs.php-version }}
+
+      - name: Setup Node.js Environment.
+        uses: $/actions/node-setup
+        with:
+          cache: ${{ inputs.cache }}
+          install-command: ${{ inputs.install-command }}
+          node-version: ${{ inputs.node-version }}
+          node-version-file: ${{ inputs.node-version-file }}
+
+      - name: Run commands.
+        if: inputs.commands != ''
+        shell: bash
+        env:
+          COMMANDS: ${{ inputs.commands }}
+        run: |
+          set -euo pipefail
+
+          commands=()
+
+          while IFS= read -r command; do
+            if [[ "$command" =~ [^[:space:]] ]]; then
+              commands+=("$command")
+            fi
+          done <<< "$COMMANDS"
+
+          if [ "${#commands[@]}" -eq 0 ]; then
+            echo "No commands configured; skipping."
+            exit 0
+          fi
+
+          # Each line runs in its own shell and log group; the first failing line stops the step.
+          # Workflow command messages encode `%` as `%25`.
+          for command in "${commands[@]}"; do
+            title="${command//\%/%25}"
+            status=0
+
+            echo "::group::$title"
+            bash -euo pipefail -c "$command" || status=$?
+            echo "::endgroup::"
+
+            if [ "$status" -ne 0 ]; then
+              echo "::error title=Command failed::$title (exit code $status)"
+              exit "$status"
+            fi
+          done
+
+      - name: Detect drift in generated files.
+        if: inputs.drift-paths != ''
+        shell: bash
+        env:
+          DRIFT_INCLUDE_IGNORED: ${{ inputs.drift-include-ignored }}
+          DRIFT_PATHS: ${{ inputs.drift-paths }}
+        run: |
+          set -euo pipefail
+
+          args=(status --porcelain --untracked-files=all)
+          pathspecs=()
+
+          if [ "$DRIFT_INCLUDE_IGNORED" = "true" ]; then
+            args+=("--ignored=matching")
+          fi
+
+          while IFS= read -r pathspec; do
+            if [[ "$pathspec" =~ [^[:space:]] ]]; then
+              pathspecs+=("$pathspec")
+            fi
+          done <<< "$DRIFT_PATHS"
+
+          if [ "${#pathspecs[@]}" -eq 0 ]; then
+            echo "No drift paths configured; skipping."
+            exit 0
+          fi
+
+          printf 'Drift command: git'
+          printf ' %q' "${args[@]}" -- "${pathspecs[@]}"
+          printf '\n'
+
+          drift="$(git "${args[@]}" -- "${pathspecs[@]}")"
+
+          if [ -n "$drift" ]; then
+            echo "::error title=Generated files drift::The files below differ from the committed files after the commands ran."
+            printf '%s\n' "$drift"
+            exit 1
+          fi
+
+          echo "No drift detected."
