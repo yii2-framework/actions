@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.5 Under development
 
+- ci(actions): add the reusable `assets.yml` and `playwright.yml` workflows and the `node-setup` and `playwright` composite actions.
+
 ## v2.0.4 November 21, 2026
 
 - feat(workflows): add `ignore-platform-reqs-php-version` input to add `--ignore-platform-reqs` only for the listed PHP versions.

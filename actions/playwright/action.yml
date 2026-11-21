@@ -1,0 +1,62 @@
+---
+name: Playwright browsers.
+description: Install Playwright browsers with the Playwright version installed in the project dependencies.
+
+inputs:
+  browsers:
+    description: Browsers to install, separated by whitespace; empty installs the Playwright default browsers.
+    default: chromium
+    required: false
+  only-shell:
+    description: Whether to add --only-shell to install only the headless shell of Chromium.
+    default: false
+    required: false
+  with-deps:
+    description: Whether to add --with-deps to install the operating system dependencies of the browsers.
+    default: true
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Install Playwright browsers.
+      shell: bash
+      env:
+        PLAYWRIGHT_BROWSERS: ${{ inputs.browsers }}
+        PLAYWRIGHT_ONLY_SHELL: ${{ inputs.only-shell }}
+        PLAYWRIGHT_WITH_DEPS: ${{ inputs.with-deps }}
+      run: |
+        set -euo pipefail
+
+        # `--no` makes npx use the Playwright version installed in the project and never download another one.
+        if ! version="$(npx --no -- playwright --version)"; then
+          echo "::error title=Playwright not installed::Add playwright or @playwright/test to the project dependencies and install them before this action."
+          exit 1
+        fi
+
+        echo "Using Playwright: $version"
+
+        args=(install)
+
+        if [ "$PLAYWRIGHT_WITH_DEPS" = "true" ]; then
+          args+=("--with-deps")
+        fi
+
+        if [ "$PLAYWRIGHT_ONLY_SHELL" = "true" ]; then
+          args+=("--only-shell")
+        fi
+
+        # Browsers are whitespace-separated; each word is passed as one argument.
+        if [ -n "$PLAYWRIGHT_BROWSERS" ]; then
+          read -r -a browsers <<< "${PLAYWRIGHT_BROWSERS//[$'\r\n']/ }"
+
+          if [ "${#browsers[@]}" -gt 0 ]; then
+            args+=("${browsers[@]}")
+          fi
+        fi
+
+        printf 'Playwright command:'
+        printf ' %q' npx --no -- playwright "${args[@]}"
+        printf '\n'
+
+        npx --no -- playwright "${args[@]}"
