@@ -294,6 +294,23 @@ jobs:
       testo-type: "!bench"
 ```
 
+### Platform requirements per PHP version
+
+The `ignore-platform-reqs-php-version` input adds `--ignore-platform-reqs` to the Composer command only for the listed
+PHP versions, while `ignore-platform-reqs` keeps applying it to every version. Listed versions that are not part of the
+matrix have no effect, so the caller does not need to know which PHP versions the workflow runs.
+
+It is available in the `codeception.yml`, `composer-require-checker.yml`, `infection.yml`, `phpstan.yml`,
+`phpunit.yml`, `phpunit-database.yml` and `testo.yml` workflows.
+
+```yaml
+jobs:
+  phpunit:
+    uses: yii2-framework/actions/.github/workflows/phpunit.yml@v2
+    with:
+      ignore-platform-reqs-php-version: "[8.6]"
+```
+
 ### Linter
 
 ```yaml

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.4 Under development
 
+- feat(workflows): add `ignore-platform-reqs-php-version` input to add `--ignore-platform-reqs` only for the listed PHP versions.
+
 ## v2.0.3 November 19, 2026
 
 - ci(workflows): update PHP version descriptions and defaults to include `8.6`.
