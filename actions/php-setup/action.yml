@@ -131,6 +131,7 @@ runs:
             (
               inputs.ignore-platform-reqs == 'true'
               || contains(fromJson(inputs.ignore-platform-reqs-php-version), inputs.php-version)
+              || contains(fromJson(inputs.ignore-platform-reqs-php-version), format('{0}.0', inputs.php-version))
             )
             && '--ignore-platform-reqs'
             || ''
