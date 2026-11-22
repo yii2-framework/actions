@@ -54,6 +54,16 @@ on:
         default: ""
         required: false
         type: string
+      ignore-platform-reqs:
+        description: Whether to add --ignore-platform-reqs to composer command.
+        default: false
+        required: false
+        type: boolean
+      ignore-platform-reqs-php-version:
+        description: PHP versions as a JSON array string '[8.6]' to add --ignore-platform-reqs to composer command.
+        default: "[]"
+        required: false
+        type: string
       install-command:
         description: Command that installs the project dependencies; empty skips installation.
         default: npm ci
@@ -112,6 +122,8 @@ jobs:
           composer-flags: ${{ inputs.composer-flags }}
           coverage-driver: none
           extensions: ${{ inputs.extensions }}
+          ignore-platform-reqs: ${{ inputs.ignore-platform-reqs }}
+          ignore-platform-reqs-php-version: ${{ inputs.ignore-platform-reqs-php-version }}
           php-version: ${{ inputs.php-version }}
 
       - name: Setup Node.js Environment.

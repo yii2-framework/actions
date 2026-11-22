@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.6 Under development
 
+- feat(workflows): add Composer platform requirement options to the assets, ECS and Playwright workflows.
+
 ## v2.0.5 November 21, 2026
 
 - ci(actions): add the reusable `assets.yml` and `playwright.yml` workflows and the `node-setup` and `playwright` composite actions.

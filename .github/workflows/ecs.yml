@@ -49,6 +49,16 @@ on:
         default:
         required: false
         type: string
+      ignore-platform-reqs:
+        description: Whether to add --ignore-platform-reqs to composer command.
+        default: false
+        required: false
+        type: boolean
+      ignore-platform-reqs-php-version:
+        description: PHP versions as a JSON array string '[8.6]' to add --ignore-platform-reqs to composer command.
+        default: "[]"
+        required: false
+        type: string
       os:
         description: OS runner as a JSON array string '["ubuntu-latest"]'.
         default: '["ubuntu-latest"]'
@@ -132,6 +142,8 @@ jobs:
           composer-version: ${{ inputs.composer-version }}
           coverage-driver: none
           extensions: ${{ inputs.extensions }}
+          ignore-platform-reqs: ${{ inputs.ignore-platform-reqs }}
+          ignore-platform-reqs-php-version: ${{ inputs.ignore-platform-reqs-php-version }}
           ini-values: ${{ inputs.php-ini-values }}
           php-version: ${{ matrix.php-version }}
           tools: ${{ inputs.tools }}

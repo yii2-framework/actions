@@ -453,11 +453,11 @@ jobs:
 ### Platform requirements per PHP version
 
 The `ignore-platform-reqs-php-version` input adds `--ignore-platform-reqs` to the Composer command only for the listed
-PHP versions, while `ignore-platform-reqs` keeps applying it to every version. Listed versions that are not part of the
-matrix have no effect, so the caller does not need to know which PHP versions the workflow runs.
+PHP versions, while `ignore-platform-reqs` keeps applying it to every version. Listed versions that are not used by the
+workflow have no effect. In Assets and Playwright, both inputs apply only when `php-version` enables PHP setup.
 
-It is available in the `codeception.yml`, `composer-require-checker.yml`, `infection.yml`, `phpstan.yml`,
-`phpunit.yml`, `phpunit-database.yml` and `testo.yml` workflows.
+Both inputs are available in the `assets.yml`, `codeception.yml`, `composer-require-checker.yml`, `ecs.yml`,
+`infection.yml`, `phpstan.yml`, `phpunit.yml`, `phpunit-database.yml`, `playwright.yml` and `testo.yml` workflows.
 
 ```yaml
 jobs:
