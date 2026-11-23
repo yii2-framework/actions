@@ -7,7 +7,6 @@ on:
       composer-command:
         description: Composer command (install or update) to run.
         default: update
-        required: false
         type: string
       composer-flags:
         description: Additional composer flags
@@ -17,107 +16,86 @@ on:
           --no-progress
           --optimize-autoloader
           --ansi
-        required: false
         type: string
       composer-version:
         description: Composer version to use.
         default:
-        required: false
         type: string
       concurrency-group:
         description: Concurrency group name.
         default: ${{ github.workflow }}-${{ github.ref }}
-        required: false
         type: string
       coverage-driver:
         description: Code coverage driver to use (pcov, xdebug).
         default: pcov
-        required: false
         type: string
       coverage-file:
         description: Coverage output file name.
         default: coverage.xml
-        required: false
         type: string
       coverage-format:
         description: Coverage report format (clover, html, xml).
         default: clover
-        required: false
         type: string
       enable-concurrency:
         description: Enable concurrency.
         default: true
-        required: false
         type: boolean
       extensions:
         description: List of extensions to PHP.
         default:
-        required: false
         type: string
       hook:
         description: Hook to run.
         default:
-        required: false
         type: string
       ignore-platform-reqs:
         description: Whether to add --ignore-platform-reqs to composer command.
         default: false
-        required: false
         type: boolean
       ignore-platform-reqs-php-version:
         description: PHP versions as a JSON array string '[8.6]' to add --ignore-platform-reqs to composer command.
         default: "[]"
-        required: false
         type: string
       os:
         description: OS runner as a JSON array string '["ubuntu-latest"]'.
         default: '["ubuntu-latest","windows-2022"]'
-        required: false
         type: string
       phpunit-configuration:
         description: PHPUnit configuration file.
         default: ""
-        required: false
         type: string
       phpunit-debug:
         description: Display warnings in phpunit.
         default: ""
-        required: false
         type: string
       phpunit-exclude-group:
         description: Exclude group from phpunit.
         default:
-        required: false
         type: string
       phpunit-group:
         description: Include specific group in phpunit.
         default:
-        required: false
         type: string
       phpunit-path:
         description: Path to PHPUnit executable.
         default: vendor/bin/phpunit
-        required: false
         type: string
       phpunit-test-suite:
         description: Specific test suite to run.
         default: ""
-        required: false
         type: string
       php-ini-values:
         description: Initial values for PHP configuration.
         default: date.timezone='UTC'
-        required: false
         type: string
       php-version:
         description: PHP versions as a JSON array string '[8.6]'.
         default: "[8.3, 8.4, 8.5, 8.6]"
-        required: false
         type: string
       tools:
         description: Tools to test, separated by comma.
         default:
-        required: false
         type: string
 
     secrets:

@@ -23,14 +23,35 @@ inputs:
     description: Additional comma-separated files or globs, appended to configuration-file exclusions.
     default: ./.git
     required: false
-  use-shared-config:
-    description: Append the shared Yii2 exclusions when no configuration file path is provided.
-    default: "false"
-    required: false
 
 runs:
   using: composite
   steps:
+    - name: Resolve codespell exclusions.
+      id: exclusions
+      shell: bash
+      env:
+        CODESPELL_CONFIG: ${{ inputs.config }}
+        CODESPELL_SKIP: ${{ inputs.skip }}
+      run: |
+        skip=''
+
+        if [ -z "$CODESPELL_CONFIG" ]; then
+          # Codespell preserves the leading ./ only when it is present in the scan path.
+          skip=$(awk '{print} /^\.\// {print substr($0, 3)}' "$GITHUB_ACTION_PATH/quality-excludes.txt" | paste -sd,)
+        fi
+
+        if [[ "$CODESPELL_SKIP" == *$'\n'* || "$CODESPELL_SKIP" == *$'\r'* ]]; then
+          echo "::error::Codespell exclusions must be a single comma-separated line."
+          exit 1
+        fi
+
+        if [ -n "$CODESPELL_SKIP" ]; then
+          skip="${skip:+$skip,}$CODESPELL_SKIP"
+        fi
+
+        printf 'skip=%s\n' "$skip" >> "$GITHUB_OUTPUT"
+
     - name: Run codespell.
       uses: codespell-project/actions-codespell@8f01853be192eb0f849a5c7d721450e7a467c579 # v2.2
       with:
@@ -38,11 +59,4 @@ runs:
         ignore_words_file: ${{ inputs.ignore-words-file }}
         ignore_words_list: ${{ inputs.ignore-words-list }}
         path: ${{ inputs.path }}
-        skip: >-
-          ${{ format(
-          './.yii2-framework-actions{0}{1}',
-          inputs.use-shared-config == 'true' && inputs.config == ''
-          && ',./.git,./.vscode/*,./composer.lock,./runtime/*,./vendor/*,./internal/*,./node_modules/*,./foxy.lock,./.phpunit.cache/*,./code_coverage/*,./.agents/*,./.claude/*,*.min.css,*.min.js,package-lock.json,scaffold-lock.json'
-          || '',
-          inputs.skip != '' && format(',{0}', inputs.skip) || ''
-          ) }}
+        skip: ${{ steps.exclusions.outputs.skip }}

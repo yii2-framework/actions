@@ -43,29 +43,17 @@ runs:
         YAMLLINT_IGNORE: ${{ inputs.ignore }}
         YAMLLINT_TARGETS: ${{ inputs.targets }}
       run: |
-        args=()
+        config="${YAMLLINT_CONFIG:-$GITHUB_ACTION_PATH/quality.yml}"
         targets=()
 
-        if [ -n "$YAMLLINT_CONFIG" ]; then
-          args+=("-c" "$YAMLLINT_CONFIG")
-        else
+        if [ -z "$YAMLLINT_CONFIG" ] && [ -n "$YAMLLINT_IGNORE" ]; then
           config="$(mktemp -d)/.yamllint.yml"
-          cat > "$config" <<'EOF'
-        extends: default
-        rules:
-          comments:
-            min-spaces-from-content: 1
-          line-length: disable
-          truthy: disable
-        ignore: |
-          .yii2-framework-actions/
-        EOF
 
-          if [ -n "$YAMLLINT_IGNORE" ]; then
-            sed 's/^/  /' <<< "$YAMLLINT_IGNORE" >> "$config"
-          fi
-
-          args+=("-c" "$config")
+          {
+            cat "$GITHUB_ACTION_PATH/quality.yml"
+            echo "ignore: |"
+            sed 's/^/  /' <<< "$YAMLLINT_IGNORE"
+          } > "$config"
         fi
 
         while IFS= read -r target; do
@@ -79,4 +67,4 @@ runs:
           exit 0
         fi
 
-        yamllint "${args[@]}" "${targets[@]}"
+        yamllint -c "$config" "${targets[@]}"

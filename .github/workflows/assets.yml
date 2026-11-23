@@ -7,17 +7,14 @@ on:
       cache:
         description: Package manager cache that setup-node restores and saves; `npm` is the supported value and empty disables the package cache.
         default: npm
-        required: false
         type: string
       commands:
         description: Commands to run in order, one per line; the job stops at the first command that fails.
         default: ""
-        required: false
         type: string
       composer-command:
         description: Composer command (install or update) to run.
         default: update
-        required: false
         type: string
       composer-flags:
         description: Additional composer flags
@@ -27,67 +24,54 @@ on:
           --no-progress
           --optimize-autoloader
           --ansi
-        required: false
         type: string
       concurrency-group:
         description: Concurrency group name.
         default: ${{ github.workflow }}-${{ github.ref }}
-        required: false
         type: string
       drift-include-ignored:
         description: Whether to also report ignored files that match `drift-paths`, adding --ignored=matching to git status.
         default: false
-        required: false
         type: boolean
       drift-paths:
         description: Newline-separated Git pathspecs that must have no changes and no untracked files after the commands; empty disables the check.
         default: ""
-        required: false
         type: string
       enable-concurrency:
         description: Enable concurrency.
         default: true
-        required: false
         type: boolean
       extensions:
         description: List of extensions to PHP.
         default: ""
-        required: false
         type: string
       ignore-platform-reqs:
         description: Whether to add --ignore-platform-reqs to composer command.
         default: false
-        required: false
         type: boolean
       ignore-platform-reqs-php-version:
         description: PHP versions as a JSON array string '[8.6]' to add --ignore-platform-reqs to composer command.
         default: "[]"
-        required: false
         type: string
       install-command:
         description: Command that installs the project dependencies; empty skips installation.
         default: npm ci
-        required: false
         type: string
       node-version:
         description: Node.js version to use (for example, "24"); takes precedence over `node-version-file`.
         default: ""
-        required: false
         type: string
       node-version-file:
         description: File that declares the Node.js version, used only when `node-version` is empty.
         default: .nvmrc
-        required: false
         type: string
       os:
         description: OS runner as a JSON array string '["ubuntu-latest"]'.
         default: '["ubuntu-latest"]'
-        required: false
         type: string
       php-version:
         description: PHP version to install with Composer dependencies before Node.js (for example, "8.3"); empty skips PHP.
         default: ""
-        required: false
         type: string
 
 permissions:

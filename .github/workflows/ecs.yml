@@ -7,12 +7,10 @@ on:
       command-options:
         description: Options for the Easy Coding Standard tool.
         default: check --ansi
-        required: false
         type: string
       composer-command:
         description: Composer command (install or update) to run.
         default: update
-        required: false
         type: string
       composer-flags:
         description: Additional composer flags
@@ -22,62 +20,50 @@ on:
           --no-progress
           --optimize-autoloader
           --ansi
-        required: false
         type: string
       composer-version:
         description: Composer version to use.
         default:
-        required: false
         type: string
       concurrency-group:
         description: Concurrency group name.
         default: ${{ github.workflow }}-${{ github.ref }}
-        required: false
         type: string
       download-config:
         description: Whether to download the ECS config file.
         default: false
-        required: false
         type: boolean
       enable-concurrency:
         description: Enable concurrency.
         default: true
-        required: false
         type: boolean
       extensions:
         description: List of extensions to PHP.
         default:
-        required: false
         type: string
       ignore-platform-reqs:
         description: Whether to add --ignore-platform-reqs to composer command.
         default: false
-        required: false
         type: boolean
       ignore-platform-reqs-php-version:
         description: PHP versions as a JSON array string '[8.6]' to add --ignore-platform-reqs to composer command.
         default: "[]"
-        required: false
         type: string
       os:
         description: OS runner as a JSON array string '["ubuntu-latest"]'.
         default: '["ubuntu-latest"]'
-        required: false
         type: string
       php-ini-values:
         description: Initial values for PHP configuration.
         default: date.timezone='UTC'
-        required: false
         type: string
       php-version:
         description: PHP versions as a JSON array string '[8.6]'.
         default: "[8.6]"
-        required: false
         type: string
       tools:
         description: Tools to test, separated by comma.
         default:
-        required: false
         type: string
 
     secrets:

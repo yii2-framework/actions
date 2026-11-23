@@ -24,35 +24,55 @@ your CI/CD pipeline with battle-tested, configurable workflows for testing, stat
 
 ### Testing Workflows
 
-- [`assets.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/assets.yml) - Front-end asset commands with generated file drift detection.
-- [`codeception.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/codeception.yml) - Codeception testing framework.
-- [`infection.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/infection.yml) - Mutation testing with Infection.
-- [`phpunit-database.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpunit-database.yml) - PHPUnit with database services.
-- [`phpunit.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpunit.yml) - PHPUnit testing with coverage.
-- [`playwright.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/playwright.yml) - Playwright browser testing.
-- [`testo.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/testo.yml) - Testo testing with coverage.
+- [`assets.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/assets.yml) - Front-end asset
+  commands with generated file drift detection.
+- [`codeception.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/codeception.yml) -
+  Codeception testing framework.
+- [`infection.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/infection.yml) - Mutation
+  testing with Infection.
+- [`phpunit-database.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpunit-database.yml) -
+  PHPUnit with database services.
+- [`phpunit.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpunit.yml) - PHPUnit testing
+  with coverage.
+- [`playwright.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/playwright.yml) - Playwright
+  browser testing.
+- [`testo.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/testo.yml) - Testo testing with
+  coverage.
 
 ### Quality Assurance Workflows
 
-- [`composer-require-checker.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/composer-require-checker.yml) - Dependency validation.
+- [`composer-require-checker.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/composer-require-checker.yml) -
+  Dependency validation.
 - [`ecs.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/ecs.yml) - Easy Coding Standard.
 - [`phpstan.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/phpstan.yml) - Static analysis.
-- [`quality.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/quality.yml) - Reusable quality checks.
-- [`scorecard.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/scorecard.yml) - OpenSSF Scorecard supply-chain security analysis.
-- [`security.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/security.yml) - Security checks for GitHub Actions and secrets.
+- [`quality.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/quality.yml) - Reusable quality
+  checks.
+- [`scorecard.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/scorecard.yml) - OpenSSF
+  Scorecard supply-chain security analysis.
+- [`security.yml`](https://github.com/yii2-framework/actions/blob/main/.github/workflows/security.yml) - Security checks
+  for GitHub Actions and secrets.
 
 ### Utility Actions
 
-- [`actionlint`](https://github.com/yii2-framework/actions/blob/main/actions/actionlint/action.yml) - GitHub Actions workflow linting.
+- [`actionlint`](https://github.com/yii2-framework/actions/blob/main/actions/actionlint/action.yml) - GitHub Actions
+  workflow linting.
 - [`codespell`](https://github.com/yii2-framework/actions/blob/main/actions/codespell/action.yml) - Spelling validation.
-- [`editorconfig-checker`](https://github.com/yii2-framework/actions/blob/main/actions/editorconfig-checker/action.yml) - EditorConfig validation.
-- [`markdownlint`](https://github.com/yii2-framework/actions/blob/main/actions/markdownlint/action.yml) - Markdown validation.
-- [`node-setup`](https://github.com/yii2-framework/actions/blob/main/actions/node-setup/action.yml) - Node.js environment setup.
-- [`php-setup`](https://github.com/yii2-framework/actions/blob/main/actions/php-setup/action.yml) - PHP environment setup.
-- [`phpunit-runner`](https://github.com/yii2-framework/actions/blob/main/actions/phpunit/action.yml) - Advanced PHPUnit execution.
-- [`playwright`](https://github.com/yii2-framework/actions/blob/main/actions/playwright/action.yml) - Playwright browser installation.
-- [`prettier`](https://github.com/yii2-framework/actions/blob/main/actions/prettier/action.yml) - Markdown and YAML formatting validation.
-- [`testo-runner`](https://github.com/yii2-framework/actions/blob/main/actions/testo/action.yml) - Advanced Testo execution.
+- [`editorconfig-checker`](https://github.com/yii2-framework/actions/blob/main/actions/editorconfig-checker/action.yml) -
+  EditorConfig validation.
+- [`markdownlint`](https://github.com/yii2-framework/actions/blob/main/actions/markdownlint/action.yml) - Markdown
+  validation.
+- [`node-setup`](https://github.com/yii2-framework/actions/blob/main/actions/node-setup/action.yml) - Node.js
+  environment setup.
+- [`php-setup`](https://github.com/yii2-framework/actions/blob/main/actions/php-setup/action.yml) - PHP environment
+  setup.
+- [`phpunit-runner`](https://github.com/yii2-framework/actions/blob/main/actions/phpunit/action.yml) - Advanced PHPUnit
+  execution.
+- [`playwright`](https://github.com/yii2-framework/actions/blob/main/actions/playwright/action.yml) - Playwright browser
+  installation.
+- [`prettier`](https://github.com/yii2-framework/actions/blob/main/actions/prettier/action.yml) - Markdown and YAML
+  formatting validation.
+- [`testo-runner`](https://github.com/yii2-framework/actions/blob/main/actions/testo/action.yml) - Advanced Testo
+  execution.
 - [`yamllint`](https://github.com/yii2-framework/actions/blob/main/actions/yamllint/action.yml) - YAML validation.
 
 ## Quick start
@@ -109,8 +129,8 @@ jobs:
 - `cache` (default `npm`) restores the package manager cache keyed on the lock file, so it requires a committed lock
   file. `npm` is the only supported value, because setup-node asks the package manager itself for its cache directory
   and these workflows install nothing before it. Set it to an empty string to disable the cache; with `cache: ""`
-  setup-node runs no package manager, so a project that uses another package manager can pass its own
-  `install-command`, provided that the command makes that package manager available first.
+  setup-node runs no package manager, so a project that uses another package manager can pass its own `install-command`,
+  provided that the command makes that package manager available first.
 - PHP is set up only when `php-version` is given: the job then installs that single PHP version without a coverage
   driver and runs `composer <composer-command> <composer-flags>` before Node.js. With the default empty value, PHP and
   Composer are skipped entirely.
@@ -365,9 +385,9 @@ jobs:
   `TIME_PICKER_BROWSERS="chromium firefox webkit" npm test`.
 - `artifact-path` is uploaded only when the job fails, as `<artifact-name>-<os>`. Paths that do not exist produce a
   warning, not a failure.
-- A caller may put its own `strategy.matrix` on the job that calls `assets.yml` or `playwright.yml`. It must then pass
-  a `concurrency-group` and, for `playwright.yml`, an `artifact-name` that include the matrix values; otherwise all
-  cells share one concurrency group and cancel each other, and their artifacts collide.
+- A caller may put its own `strategy.matrix` on the job that calls `assets.yml` or `playwright.yml`. It must then pass a
+  `concurrency-group` and, for `playwright.yml`, an `artifact-name` that include the matrix values; otherwise all cells
+  share one concurrency group and cancel each other, and their artifacts collide.
 
 ```yaml
 jobs:
@@ -503,12 +523,16 @@ codespell, EditorConfig Checker, markdownlint-cli2 and Prettier use the configur
 workflow commit, so the calling repository needs no `.github/linters` files, `.prettierrc.json` or `.prettierignore`.
 Its `.editorconfig` still defines the EditorConfig rules. actionlint and yamllint apply built-in defaults.
 
-The shared configuration is on by default and replaces the configuration files that Prettier and EditorConfig Checker
-would otherwise discover in the calling repository. Pass `prettier-config` or `editorconfig-checker-config` to keep
-using them, or set `use-shared-config: false` to run the tools without the shared configuration.
+The shared configuration replaces the configuration files that Prettier and EditorConfig Checker would otherwise
+discover in the calling repository. Pass `prettier-config` or `editorconfig-checker-config` to keep using them.
+
+The shared codespell rules skip non-English Yii translation catalogs, generated mutation reports and JavaScript/CSS
+source maps, and specific generated RPC or upstream frontend files. English catalogs, tests, documentation, and license
+files remain in scope. Use `codespell-skip` for additional repository-specific paths.
 
 The shared Prettier exclusions cover the default Markdown and YAML scan; `prettier-ignore-path` or `prettier-patterns`
-replace the exclusions only, not the formatting rules.
+replace the exclusions only, not the formatting rules. Without `prettier-ignore-path`, Prettier also honors the
+`.gitignore` and `.prettierignore` files in the root of the calling repository.
 
 ### Security
 
@@ -570,11 +594,11 @@ jobs:
 
 - Scorecard analyzes the default branch only, so trigger the workflow with `push` on that branch and `schedule`.
 - `file-mode` defaults to `git`, so Scorecard also analyzes paths such as `.github` that `.gitattributes` marks with
-  `export-ignore`. The default `archive` mode of the action reads the GitHub tarball and skips those paths, which
-  hides workflows, the security policy and token permissions from the checks.
-- `publish-results` sends signed results to the OpenSSF Scorecard API, which replaces the weekly public scan and
-  enables the badge and the viewer for public repositories. The API verifies the called workflow, so the job keeps a
-  literal `ubuntu-latest` runner and only allowlisted steps.
+  `export-ignore`. The default `archive` mode of the action reads the GitHub tarball and skips those paths, which hides
+  workflows, the security policy and token permissions from the checks.
+- `publish-results` sends signed results to the OpenSSF Scorecard API, which replaces the weekly public scan and enables
+  the badge and the viewer for public repositories. The API verifies the called workflow, so the job keeps a literal
+  `ubuntu-latest` runner and only allowlisted steps.
 - `upload-sarif` sends the SARIF results to GitHub code scanning, which private repositories only provide with GitHub
   Code Security. Set it to `false` there, otherwise the upload fails with HTTP 403 after the Scorecard run and the
   artifact upload complete.
@@ -585,7 +609,8 @@ jobs:
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/{owner}/{repo}/badge)](https://scorecard.dev/viewer/?uri=github.com/{owner}/{repo})
 ```
 
-> **Note**: YAML files should use 2-space indentation. This example shows correct YAML syntax - copy it to your `.github/workflows/*.yml` files as-is.
+> **Note**: YAML files should use 2-space indentation. This example shows correct YAML syntax - copy it to your
+> `.github/workflows/*.yml` files as-is.
 
 ## Package information
 
