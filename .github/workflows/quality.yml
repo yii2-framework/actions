@@ -4,10 +4,6 @@ name: quality
 on:
   workflow_call:
     inputs:
-      actionlint-version:
-        description: actionlint version to use.
-        default: 1.7.12
-        type: string
       actionlint-config:
         description: Path to actionlint configuration file.
         default: ""
@@ -44,10 +40,6 @@ on:
         description: Concurrency group name.
         default: quality/${{ github.workflow }}-${{ github.ref }}
         type: string
-      editorconfig-checker-version:
-        description: EditorConfig Checker version to use.
-        default: v3.7.0
-        type: string
       editorconfig-checker-config:
         description: Path to EditorConfig Checker configuration file.
         default: ""
@@ -60,10 +52,6 @@ on:
         description: Enable concurrency.
         default: true
         type: boolean
-      markdownlint-cli2-version:
-        description: markdownlint-cli2 version to use.
-        default: 0.22.1
-        type: string
       markdownlint-config:
         description: Path to markdownlint-cli2 configuration file.
         default: ""
@@ -72,17 +60,9 @@ on:
         description: Newline-separated markdownlint-cli2 glob patterns.
         default: "**/*.md"
         type: string
-      node-version:
-        description: Node.js version to use.
-        default: 24
-        type: string
       os:
         description: OS runner as a JSON array string '["ubuntu-latest"]'.
         default: '["ubuntu-latest"]'
-        type: string
-      prettier-version:
-        description: Prettier version to use.
-        default: 3.8.4
         type: string
       prettier-config:
         description: Path to Prettier configuration file.
@@ -100,10 +80,6 @@ on:
         description: Newline-separated Prettier file patterns. Overrides default Markdown/YAML patterns when set.
         default: ""
         type: string
-      use-shared-config:
-        description: Use the bundled Yii2 quality configuration for tools without explicit configuration paths.
-        default: true
-        type: boolean
       validate_editorconfig:
         description: Enable EditorConfig validation.
         default: true
@@ -132,10 +108,6 @@ on:
         description: Enable YAML formatting validation with Prettier.
         default: true
         type: boolean
-      yamllint-version:
-        description: yamllint version to use.
-        default: 1.38.0
-        type: string
       yamllint-config:
         description: Path to yamllint configuration file.
         default: ""
@@ -181,7 +153,6 @@ jobs:
         with:
           config: ${{ inputs.actionlint-config }}
           flags: ${{ inputs.actionlint-flags }}
-          version: ${{ inputs.actionlint-version }}
 
   editorconfig:
     if: ${{ inputs.validate_editorconfig }}
@@ -209,8 +180,6 @@ jobs:
         with:
           config: ${{ inputs.editorconfig-checker-config }}
           exclude: ${{ inputs.editorconfig-checker-exclude }}
-          use-shared-config: ${{ inputs.use-shared-config }}
-          version: ${{ inputs.editorconfig-checker-version }}
 
   markdown:
     if: ${{ inputs.validate_markdown }}
@@ -238,9 +207,6 @@ jobs:
         with:
           config: ${{ inputs.markdownlint-config }}
           globs: ${{ inputs.markdownlint-globs }}
-          node-version: ${{ inputs.node-version }}
-          use-shared-config: ${{ inputs.use-shared-config }}
-          version: ${{ inputs.markdownlint-cli2-version }}
 
   prettier:
     if: ${{ inputs.validate_markdown_prettier || inputs.validate_yaml_prettier }}
@@ -269,12 +235,9 @@ jobs:
           config: ${{ inputs.prettier-config }}
           ignore-path: ${{ inputs.prettier-ignore-path }}
           no-error-on-unmatched-pattern: ${{ inputs.prettier-no-error-on-unmatched-pattern }}
-          node-version: ${{ inputs.node-version }}
           patterns: ${{ inputs.prettier-patterns }}
-          use-shared-config: ${{ inputs.use-shared-config }}
           validate-markdown: ${{ inputs.validate_markdown_prettier }}
           validate-yaml: ${{ inputs.validate_yaml_prettier }}
-          version: ${{ inputs.prettier-version }}
 
   spelling:
     if: ${{ inputs.validate_spell_codespell }}
@@ -305,7 +268,6 @@ jobs:
           ignore-words-list: ${{ inputs.codespell-ignore-words-list }}
           path: ${{ inputs.codespell-path }}
           skip: ${{ inputs.codespell-skip }}
-          use-shared-config: ${{ inputs.use-shared-config }}
 
   yaml:
     if: ${{ inputs.validate_yaml }}
@@ -334,4 +296,3 @@ jobs:
           config: ${{ inputs.yamllint-config }}
           ignore: ${{ inputs.yamllint-ignore }}
           targets: ${{ inputs.yamllint-targets }}
-          version: ${{ inputs.yamllint-version }}

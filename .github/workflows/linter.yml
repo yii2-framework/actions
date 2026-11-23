@@ -12,5 +12,3 @@ jobs:
   analyze:
     name: Analyze
     uses: $/.github/workflows/quality.yml
-    with:
-      prettier-config: .prettierrc.json
