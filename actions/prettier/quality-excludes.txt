@@ -1,0 +1,9 @@
+.agents/**
+.claude/**
+.vscode/**
+runtime/**
+node_modules/**
+vendor/**
+**/LICENSE*
+code_coverage/**
+internal/**

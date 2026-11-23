@@ -124,6 +124,11 @@ on:
         default: ""
         required: false
         type: string
+      use-shared-config:
+        description: Use the bundled Yii2 quality configuration for tools without explicit configuration paths.
+        default: true
+        required: false
+        type: boolean
       validate_editorconfig:
         description: Enable EditorConfig validation.
         default: true
@@ -240,6 +245,7 @@ jobs:
         with:
           config: ${{ inputs.editorconfig-checker-config }}
           exclude: ${{ inputs.editorconfig-checker-exclude }}
+          use-shared-config: ${{ inputs.use-shared-config }}
           version: ${{ inputs.editorconfig-checker-version }}
 
   markdown:
@@ -269,6 +275,7 @@ jobs:
           config: ${{ inputs.markdownlint-config }}
           globs: ${{ inputs.markdownlint-globs }}
           node-version: ${{ inputs.node-version }}
+          use-shared-config: ${{ inputs.use-shared-config }}
           version: ${{ inputs.markdownlint-cli2-version }}
 
   prettier:
@@ -300,6 +307,7 @@ jobs:
           no-error-on-unmatched-pattern: ${{ inputs.prettier-no-error-on-unmatched-pattern }}
           node-version: ${{ inputs.node-version }}
           patterns: ${{ inputs.prettier-patterns }}
+          use-shared-config: ${{ inputs.use-shared-config }}
           validate-markdown: ${{ inputs.validate_markdown_prettier }}
           validate-yaml: ${{ inputs.validate_yaml_prettier }}
           version: ${{ inputs.prettier-version }}
@@ -333,6 +341,7 @@ jobs:
           ignore-words-list: ${{ inputs.codespell-ignore-words-list }}
           path: ${{ inputs.codespell-path }}
           skip: ${{ inputs.codespell-skip }}
+          use-shared-config: ${{ inputs.use-shared-config }}
 
   yaml:
     if: ${{ inputs.validate_yaml }}

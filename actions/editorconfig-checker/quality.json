@@ -1,0 +1,16 @@
+{
+    "Exclude": [
+        "^composer\\.lock$",
+        "^foxy\\.lock$",
+        "^runtime/",
+        "^vendor/",
+        "^internal/",
+        "^node_modules/",
+        "^\\.phpunit\\.cache/",
+        "^code_coverage/",
+        "^\\.agents/",
+        "^\\.claude/",
+        "phpstan-baseline\\.neon$",
+        "scaffold-lock\\.json$"
+    ]
+}
