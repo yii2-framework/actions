@@ -488,22 +488,27 @@ jobs:
     #   codespell-ignore-words-list: foo,bar
     #   codespell-skip: ./resource/*
     #   editorconfig-checker-exclude: ^tests/runtime/
-    # Optional configuration and ignore paths; a path replaces the shared configuration of that tool.
+    # Optional configuration paths; a path replaces the shared configuration of that tool.
     #   actionlint-config: .github/linters/actionlint.yml
     #   codespell-config: .github/linters/.codespellrc
     #   editorconfig-checker-config: .github/linters/.editorconfig-checker.json
     #   markdownlint-config: .github/linters/.markdown-lint.yml
     #   prettier-config: .prettierrc.json
-    #   prettier-ignore-path: .prettierignore
     #   yamllint-config: .github/linters/.yamllint.yml
+    # Optional ignore path; it replaces the shared Prettier exclusions, not the formatting rules.
+    #   prettier-ignore-path: .prettierignore
 ```
 
 codespell, EditorConfig Checker, markdownlint-cli2 and Prettier use the configuration bundled with the referenced
 workflow commit, so the calling repository needs no `.github/linters` files, `.prettierrc.json` or `.prettierignore`.
 Its `.editorconfig` still defines the EditorConfig rules. actionlint and yamllint apply built-in defaults.
 
+The shared configuration is on by default and replaces the configuration files that Prettier and EditorConfig Checker
+would otherwise discover in the calling repository. Pass `prettier-config` or `editorconfig-checker-config` to keep
+using them, or set `use-shared-config: false` to run the tools without the shared configuration.
+
 The shared Prettier exclusions cover the default Markdown and YAML scan; `prettier-ignore-path` or `prettier-patterns`
-replace them. Set `use-shared-config: false` to run these tools without the shared configuration.
+replace the exclusions only, not the formatting rules.
 
 ### Security
 
