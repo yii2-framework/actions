@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.7 Under development
 
+- feat(workflows)!: use bundled lint configuration by default in the quality workflow; set `use-shared-config: false` to opt out.
+
 ## v2.0.6 November 22, 2026
 
 - feat(workflows): add Composer platform requirement options to the assets, ECS and Playwright workflows.

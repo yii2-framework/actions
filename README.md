@@ -475,24 +475,35 @@ on:
   - pull_request
   - push
 
-name: linter
+name: quality
+
+permissions:
+  contents: read
 
 jobs:
-  linter:
+  quality:
     uses: yii2-framework/actions/.github/workflows/quality.yml@main
-    permissions:
-      contents: read
-    # Optional configuration and ignore paths, including former .github/linters files.
+    # Optional additions on top of the shared configuration.
     # with:
+    #   codespell-ignore-words-list: foo,bar
+    #   codespell-skip: ./resource/*
+    #   editorconfig-checker-exclude: ^tests/runtime/
+    # Optional configuration and ignore paths; a path replaces the shared configuration of that tool.
     #   actionlint-config: .github/linters/actionlint.yml
     #   codespell-config: .github/linters/.codespellrc
-    #   codespell-ignore-words-file: .github/linters/codespell-ignored-words.txt
     #   editorconfig-checker-config: .github/linters/.editorconfig-checker.json
     #   markdownlint-config: .github/linters/.markdown-lint.yml
-    #   prettier-config: .github/linters/.prettierrc
-    #   prettier-ignore-path: .github/linters/.prettierignore
-    #   yamllint-config: .github/linters/.yaml-lint.yml
+    #   prettier-config: .prettierrc.json
+    #   prettier-ignore-path: .prettierignore
+    #   yamllint-config: .github/linters/.yamllint.yml
 ```
+
+codespell, EditorConfig Checker, markdownlint-cli2 and Prettier use the configuration bundled with the referenced
+workflow commit, so the calling repository needs no `.github/linters` files, `.prettierrc.json` or `.prettierignore`.
+Its `.editorconfig` still defines the EditorConfig rules. actionlint and yamllint apply built-in defaults.
+
+The shared Prettier exclusions cover the default Markdown and YAML scan; `prettier-ignore-path` or `prettier-patterns`
+replace them. Set `use-shared-config: false` to run these tools without the shared configuration.
 
 ### Security
 

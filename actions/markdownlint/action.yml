@@ -15,6 +15,10 @@ inputs:
     description: Node.js version to use.
     default: 24
     required: false
+  use-shared-config:
+    description: Use the bundled Yii2 quality configuration when no explicit path is provided.
+    default: "false"
+    required: false
   version:
     description: markdownlint-cli2 version to use.
     default: 0.22.1
@@ -34,6 +38,7 @@ runs:
         MARKDOWNLINT_CONFIG: ${{ inputs.config }}
         MARKDOWNLINT_CLI2_VERSION: ${{ inputs.version }}
         MARKDOWNLINT_GLOBS: ${{ inputs.globs }}
+        USE_SHARED_CONFIG: ${{ inputs.use-shared-config }}
       run: |
         args=()
         globs=()
@@ -41,6 +46,8 @@ runs:
 
         if [ -n "$MARKDOWNLINT_CONFIG" ]; then
           args+=("--config" "$MARKDOWNLINT_CONFIG")
+        elif [ "$USE_SHARED_CONFIG" = "true" ]; then
+          args+=("--config" "$GITHUB_ACTION_PATH/.markdownlint-cli2.yaml")
         else
           config="$(mktemp -d)/.markdownlint-cli2.jsonc"
           cat > "$config" <<'EOF'

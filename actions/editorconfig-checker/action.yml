@@ -11,6 +11,10 @@ inputs:
     description: Regular expression for paths excluded by EditorConfig Checker.
     default: ""
     required: false
+  use-shared-config:
+    description: Use the bundled Yii2 quality configuration when no explicit path is provided.
+    default: "false"
+    required: false
   version:
     description: EditorConfig Checker version to use.
     default: v3.7.0
@@ -29,12 +33,15 @@ runs:
       env:
         EDITORCONFIG_CHECKER_CONFIG: ${{ inputs.config }}
         EDITORCONFIG_CHECKER_EXCLUDE: ${{ inputs.exclude }}
+        USE_SHARED_CONFIG: ${{ inputs.use-shared-config }}
       run: |
         args=()
         default_exclude='(^|/)\.yii2-framework-actions/'
 
         if [ -n "$EDITORCONFIG_CHECKER_CONFIG" ]; then
           args+=("-config" "$EDITORCONFIG_CHECKER_CONFIG")
+        elif [ "$USE_SHARED_CONFIG" = "true" ]; then
+          args+=("-config" "$GITHUB_ACTION_PATH/quality.json")
         fi
 
         if [ -n "$EDITORCONFIG_CHECKER_EXCLUDE" ]; then

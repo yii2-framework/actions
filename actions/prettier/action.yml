@@ -23,6 +23,10 @@ inputs:
     description: Newline-separated Prettier file patterns. Overrides default Markdown/YAML patterns when set.
     default: ""
     required: false
+  use-shared-config:
+    description: Use the bundled Yii2 quality configuration when no explicit path is provided.
+    default: "false"
+    required: false
   validate-markdown:
     description: Enable Markdown formatting validation with Prettier.
     default: true
@@ -52,6 +56,7 @@ runs:
         PRETTIER_IGNORE_PATH: ${{ inputs.ignore-path }}
         PRETTIER_NO_ERROR_ON_UNMATCHED_PATTERN: ${{ inputs.no-error-on-unmatched-pattern }}
         PRETTIER_PATTERNS: ${{ inputs.patterns }}
+        USE_SHARED_CONFIG: ${{ inputs.use-shared-config }}
         VALIDATE_MARKDOWN_PRETTIER: ${{ inputs.validate-markdown }}
         VALIDATE_YAML_PRETTIER: ${{ inputs.validate-yaml }}
       run: |
@@ -64,6 +69,10 @@ runs:
 
         if [ -n "$PRETTIER_CONFIG" ]; then
           args+=("--config" "$PRETTIER_CONFIG")
+        elif [ "$USE_SHARED_CONFIG" = "true" ]; then
+          # Prettier resolves override globs that contain a slash against the directory of the configuration
+          # file, which is outside the caller's checkout, so quality.json only uses basename globs.
+          args+=("--config" "$GITHUB_ACTION_PATH/quality.json")
         fi
 
         if [ -n "$PRETTIER_IGNORE_PATH" ]; then
@@ -93,6 +102,14 @@ runs:
         if [ "${#patterns[@]}" -eq 0 ]; then
           echo "No Prettier patterns configured; skipping."
           exit 0
+        fi
+
+        if [ "$USE_SHARED_CONFIG" = "true" ] && [ -z "$PRETTIER_IGNORE_PATH" ] && [ -z "$PRETTIER_PATTERNS" ]; then
+          while IFS= read -r pattern || [ -n "$pattern" ]; do
+            if [ -n "$pattern" ]; then
+              patterns+=("!$pattern")
+            fi
+          done < "$GITHUB_ACTION_PATH/quality-excludes.txt"
         fi
 
         npm exec --yes --package "prettier@$PRETTIER_VERSION" -- \
