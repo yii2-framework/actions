@@ -31,6 +31,31 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Resolve codespell exclusions.
+      id: exclusions
+      shell: bash
+      env:
+        USE_SHARED_EXCLUSIONS: ${{ inputs.use-shared-config == 'true' && inputs.config == '' }}
+        CODESPELL_SKIP: ${{ inputs.skip }}
+      run: |
+        skip='./.yii2-framework-actions'
+
+        if [ "$USE_SHARED_EXCLUSIONS" = "true" ]; then
+          shared=$(paste -sd, "$GITHUB_ACTION_PATH/quality-excludes.txt")
+          skip+=",$shared"
+        fi
+
+        if [[ "$CODESPELL_SKIP" == *$'\n'* || "$CODESPELL_SKIP" == *$'\r'* ]]; then
+          echo "::error::Codespell exclusions must be a single comma-separated line."
+          exit 1
+        fi
+
+        if [ -n "$CODESPELL_SKIP" ]; then
+          skip+=",$CODESPELL_SKIP"
+        fi
+
+        printf 'skip=%s\n' "$skip" >> "$GITHUB_OUTPUT"
+
     - name: Run codespell.
       uses: codespell-project/actions-codespell@8f01853be192eb0f849a5c7d721450e7a467c579 # v2.2
       with:
@@ -38,11 +63,4 @@ runs:
         ignore_words_file: ${{ inputs.ignore-words-file }}
         ignore_words_list: ${{ inputs.ignore-words-list }}
         path: ${{ inputs.path }}
-        skip: >-
-          ${{ format(
-          './.yii2-framework-actions{0}{1}',
-          inputs.use-shared-config == 'true' && inputs.config == ''
-          && ',./.git,./.vscode/*,./composer.lock,./runtime/*,./vendor/*,./internal/*,./node_modules/*,./foxy.lock,./.phpunit.cache/*,./code_coverage/*,./.agents/*,./.claude/*,*.min.css,*.min.js,package-lock.json,scaffold-lock.json'
-          || '',
-          inputs.skip != '' && format(',{0}', inputs.skip) || ''
-          ) }}
+        skip: ${{ steps.exclusions.outputs.skip }}

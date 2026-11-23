@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.0.8 Under development
 
+- fix(workflows): move lint defaults to files, skip non-English, generated and upstream files in Codespell, and remove redundant settings.
+
 ## v2.0.7 November 23, 2026
 
 - feat(workflows)!: use bundled lint configuration by default in the quality workflow; set `use-shared-config: false` to opt out.

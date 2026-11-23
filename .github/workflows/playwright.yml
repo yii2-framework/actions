@@ -7,32 +7,26 @@ on:
       artifact-name:
         description: Name of the uploaded artifact, suffixed with the runner OS.
         default: playwright-report
-        required: false
         type: string
       artifact-path:
         description: Newline-separated paths (reports, traces, screenshots) uploaded as an artifact when the job fails; empty disables the upload.
         default: ""
-        required: false
         type: string
       browsers:
         description: Playwright browsers to install, separated by whitespace; empty installs the Playwright default browsers.
         default: chromium
-        required: false
         type: string
       cache:
         description: Package manager cache that setup-node restores and saves; `npm` is the supported value and empty disables the package cache.
         default: npm
-        required: false
         type: string
       commands:
         description: Commands to run in order, one per line; the job stops at the first command that fails.
         default: npx playwright test
-        required: false
         type: string
       composer-command:
         description: Composer command (install or update) to run.
         default: update
-        required: false
         type: string
       composer-flags:
         description: Additional composer flags
@@ -42,67 +36,54 @@ on:
           --no-progress
           --optimize-autoloader
           --ansi
-        required: false
         type: string
       concurrency-group:
         description: Concurrency group name.
         default: ${{ github.workflow }}-${{ github.ref }}
-        required: false
         type: string
       enable-concurrency:
         description: Enable concurrency.
         default: true
-        required: false
         type: boolean
       extensions:
         description: List of extensions to PHP.
         default: ""
-        required: false
         type: string
       ignore-platform-reqs:
         description: Whether to add --ignore-platform-reqs to composer command.
         default: false
-        required: false
         type: boolean
       ignore-platform-reqs-php-version:
         description: PHP versions as a JSON array string '[8.6]' to add --ignore-platform-reqs to composer command.
         default: "[]"
-        required: false
         type: string
       install-command:
         description: Command that installs the project dependencies; empty skips installation.
         default: npm ci
-        required: false
         type: string
       node-version:
         description: Node.js version to use (for example, "24"); takes precedence over `node-version-file`.
         default: ""
-        required: false
         type: string
       node-version-file:
         description: File that declares the Node.js version, used only when `node-version` is empty.
         default: .nvmrc
-        required: false
         type: string
       only-shell:
         description: Whether to add --only-shell to install only the headless shell of Chromium.
         default: false
-        required: false
         type: boolean
       os:
         description: OS runner as a JSON array string '["ubuntu-latest"]'.
         default: '["ubuntu-latest"]'
-        required: false
         type: string
       php-version:
         description: PHP version to install with Composer dependencies before Node.js (for example, "8.3"); empty skips PHP.
         default: ""
-        required: false
         type: string
       with-deps:
         description: Whether to add --with-deps to install the operating system dependencies of the browsers.
         default: true
-        required: false
         type: boolean
 
 permissions:

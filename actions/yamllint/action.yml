@@ -50,16 +50,7 @@ runs:
           args+=("-c" "$YAMLLINT_CONFIG")
         else
           config="$(mktemp -d)/.yamllint.yml"
-          cat > "$config" <<'EOF'
-        extends: default
-        rules:
-          comments:
-            min-spaces-from-content: 1
-          line-length: disable
-          truthy: disable
-        ignore: |
-          .yii2-framework-actions/
-        EOF
+          cp "$GITHUB_ACTION_PATH/quality.yml" "$config"
 
           if [ -n "$YAMLLINT_IGNORE" ]; then
             sed 's/^/  /' <<< "$YAMLLINT_IGNORE" >> "$config"

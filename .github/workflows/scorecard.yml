@@ -7,57 +7,46 @@ on:
       artifact-name:
         description: Name of the uploaded results artifact.
         default: scorecard-results
-        required: false
         type: string
       artifact-retention-days:
         description: Retention period in days for the uploaded results artifact.
         default: 5
-        required: false
         type: number
       checkout_fetch_depth:
         description: Fetch depth for checkout action.
         default: 1
-        required: false
         type: number
       concurrency-group:
         description: Concurrency group name.
         default: scorecard/${{ github.workflow }}-${{ github.ref }}
-        required: false
         type: string
       enable-concurrency:
         description: Enable concurrency.
         default: true
-        required: false
         type: boolean
       file-mode:
         description: Method used by Scorecard to fetch repository files (`git` or `archive`). `git` also analyzes paths excluded from archives with `export-ignore`.
         default: git
-        required: false
         type: string
       publish-results:
         description: Publish results to the OpenSSF Scorecard API to enable the badge and the public viewer (public repositories, default branch only).
         default: true
-        required: false
         type: boolean
       results-file:
         description: Path of the results file.
         default: results.sarif
-        required: false
         type: string
       results-format:
         description: Results format (`sarif`, `json` or `intoto`).
         default: sarif
-        required: false
         type: string
       upload-artifact:
         description: Upload the results file as a workflow artifact.
         default: true
-        required: false
         type: boolean
       upload-sarif:
         description: Upload SARIF results to GitHub code scanning. Set to `false` for private repositories without GitHub Code Security.
         default: true
-        required: false
         type: boolean
 
     secrets:

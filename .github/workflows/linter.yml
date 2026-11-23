@@ -11,8 +11,6 @@ permissions:
 jobs:
   analyze:
     name: Analyze
-    permissions:
-      contents: read
     uses: $/.github/workflows/quality.yml
     with:
       prettier-config: .prettierrc.json

@@ -49,11 +49,7 @@ runs:
         elif [ "$USE_SHARED_CONFIG" = "true" ]; then
           args+=("--config" "$GITHUB_ACTION_PATH/.markdownlint-cli2.yaml")
         else
-          config="$(mktemp -d)/.markdownlint-cli2.jsonc"
-          cat > "$config" <<'EOF'
-        {"config":{"MD013":false,"MD033":false}}
-        EOF
-          args+=("--config" "$config")
+          args+=("--config" "$GITHUB_ACTION_PATH/.markdownlint-cli2.jsonc")
         fi
 
         while IFS= read -r glob; do

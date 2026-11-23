@@ -507,6 +507,10 @@ The shared configuration is on by default and replaces the configuration files t
 would otherwise discover in the calling repository. Pass `prettier-config` or `editorconfig-checker-config` to keep
 using them, or set `use-shared-config: false` to run the tools without the shared configuration.
 
+The shared codespell rules skip non-English Yii translation catalogs, generated mutation reports and JavaScript/CSS
+source maps, and specific generated RPC or upstream frontend files. English catalogs, tests, documentation, and
+license files remain in scope. Use `codespell-skip` for additional repository-specific paths.
+
 The shared Prettier exclusions cover the default Markdown and YAML scan; `prettier-ignore-path` or `prettier-patterns`
 replace the exclusions only, not the formatting rules.
 

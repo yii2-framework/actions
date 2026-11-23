@@ -15,8 +15,6 @@ permissions:
 jobs:
   analyze:
     name: Analyze
-    permissions:
-      contents: read
     uses: $/.github/workflows/security.yml
     with:
       audit-inputs: .github actions
